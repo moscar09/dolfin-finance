@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('Dolfin-e2e', () => {
+describe('client-e2e', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {

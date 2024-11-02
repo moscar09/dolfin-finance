@@ -6,7 +6,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/Dolfin',
+  cacheDir: '../../node_modules/.vite/apps/client',
   server: {
     port: 4200,
     host: 'localhost',
@@ -21,7 +21,7 @@ export default defineConfig({
   //  plugins: [ nxViteTsPaths() ],
   // },
   build: {
-    outDir: '../../dist/apps/Dolfin',
+    outDir: '../../dist/apps/client',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {

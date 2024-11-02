@@ -8,10 +8,10 @@ export default defineConfig({
       cypressDir: 'src',
       bundler: 'vite',
       webServerCommands: {
-        default: 'npx nx run Dolfin:serve',
-        production: 'npx nx run Dolfin:preview',
+        default: 'npx nx run client:serve',
+        production: 'npx nx run client:preview',
       },
-      ciWebServerCommand: 'npx nx run Dolfin:preview',
+      ciWebServerCommand: 'npx nx run client:preview',
       ciBaseUrl: 'http://localhost:4300',
     }),
     baseUrl: 'http://localhost:4200',
