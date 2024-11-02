@@ -1,13 +1,34 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.css';
+import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import 'mantine-datatable/styles.layer.css';
 
-import NxWelcome from './nx-welcome';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AccountsPage, BudgetPage, TransactionsPage } from './pages';
+
+const router = createBrowserRouter([
+  { path: '/accounts', element: <AccountsPage /> },
+  { path: '/budget', element: <BudgetPage /> },
+  { path: '/transactions', element: <TransactionsPage /> },
+]);
+
+const theme = createTheme({
+  primaryColor: 'green',
+  primaryShade: 7,
+  defaultRadius: 'lg',
+});
 
 export function App() {
+  /* <ColorSchemeScript /> */
+
   return (
-    <div>
-      <NxWelcome title="Dolfin" />
-    </div>
+    <>
+      <ColorSchemeScript defaultColorScheme="light" />
+
+      <MantineProvider defaultColorScheme="light" theme={theme}>
+        <RouterProvider router={router} />
+      </MantineProvider>
+    </>
   );
 }
 
