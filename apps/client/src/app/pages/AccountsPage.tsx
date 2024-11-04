@@ -1,13 +1,11 @@
-import useSWR from 'swr';
-import { LayoutShell } from './layout';
-import { ApiClient } from '../../client/ApiClient';
+// import useSWR from 'swr';
 import { Card, Title } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
+import { LayoutShell } from './layout';
+import { useAccounts } from '../hooks/query/useAccounts';
 
 export function AccountsPage() {
-  const { data, isLoading } = useSWR('/bank-account', (args) =>
-    ApiClient.GET(args).then((res) => res.data)
-  );
+  const { isPending, data } = useAccounts();
 
   return (
     <LayoutShell>
@@ -18,7 +16,7 @@ export function AccountsPage() {
           borderRadius="sm"
           withColumnBorders
           striped
-          fetching={isLoading}
+          fetching={isPending}
           highlightOnHover
           records={data}
           columns={[

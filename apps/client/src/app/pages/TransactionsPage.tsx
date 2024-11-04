@@ -2,10 +2,13 @@ import { Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
-import useSWR from 'swr';
+
 import { ApiClient } from '../../client/ApiClient';
-import { CalendarPopover, DateRange } from '../molecules/CalendarPopover';
-import { PageTitle } from '../molecules/PageTitle';
+import {
+  CalendarPopover,
+  DateRange,
+} from '../components/molecules/CalendarPopover';
+import { PageTitle } from '../components/molecules/PageTitle';
 import { LayoutShell } from './layout';
 
 export function TransactionsPage() {

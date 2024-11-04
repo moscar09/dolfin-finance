@@ -1,10 +1,14 @@
-import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import 'mantine-datatable/styles.layer.css';
 
+import { QueryClientProvider } from '@tanstack/react-query';
+
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AccountsPage, BudgetPage, TransactionsPage } from './pages';
+import { queryClient } from './utils/queryClient';
+import { theme } from './utils/theme';
 
 const router = createBrowserRouter([
   { path: '/accounts', element: <AccountsPage /> },
@@ -12,21 +16,15 @@ const router = createBrowserRouter([
   { path: '/transactions', element: <TransactionsPage /> },
 ]);
 
-const theme = createTheme({
-  primaryColor: 'green',
-  primaryShade: 7,
-  defaultRadius: 'lg',
-});
-
 export function App() {
-  /* <ColorSchemeScript /> */
-
   return (
     <>
       <ColorSchemeScript defaultColorScheme="light" />
 
       <MantineProvider defaultColorScheme="light" theme={theme}>
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </MantineProvider>
     </>
   );
