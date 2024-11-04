@@ -10,5 +10,5 @@ export class BudgetCategory {
   name: string;
 
   @ManyToOne(() => BudgetCategoryGroup, (bcg) => bcg.budgetCategories)
-  group: BudgetCategoryGroup[];
+  group: BudgetCategoryGroup;
 }

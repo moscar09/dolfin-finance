@@ -9,14 +9,6 @@ import { LayoutShell } from './layout';
 export function BudgetPage() {
   const [monthYear, setMonthYear] = useState(dayjs());
 
-  // const {
-  //   data: budgetScaffold,
-  //   isLoading: scaffoldIsLoading,
-  //   mutate: mutateBudgetScaffold,
-  // } = useSWR('/budget-category', (args) =>
-  //   ApiClient.GET(args).then((response) => response.data)
-  // );
-
   return (
     <LayoutShell>
       <Stack>

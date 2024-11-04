@@ -1,9 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
-enum BankAccountType {
-  ASSET = 'asset',
-  EXTERNAL = 'external',
-}
+import { type BankAccountType } from '@dolfin-finance/api-types';
 
 @Entity()
 export class BankAccount {
@@ -14,11 +10,11 @@ export class BankAccount {
   name: string;
 
   @Column({ nullable: true })
-  prettyname: string;
+  prettyName: string;
 
   @Column()
   identifier: string;
 
-  @Column()
-  bankAccountType: BankAccountType;
+  @Column({ type: 'varchar', length: '10' })
+  type: BankAccountType;
 }

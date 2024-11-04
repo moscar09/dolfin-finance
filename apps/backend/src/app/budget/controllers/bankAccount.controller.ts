@@ -1,12 +1,12 @@
+import { BankAccountDto } from '@dolfin-finance/api-types';
 import { Controller, Get } from '@nestjs/common';
-import { BankAccount } from '../entities/bankAccount.entity';
 import { BankAccountService } from '../services/bankAccount.service';
 
 @Controller('bank-account')
 export class BankAccountController {
   constructor(private bankAccountService: BankAccountService) {}
   @Get()
-  findAll(): Promise<BankAccount[]> {
+  findAll(): Promise<BankAccountDto[]> {
     return this.bankAccountService.findAll();
   }
 }

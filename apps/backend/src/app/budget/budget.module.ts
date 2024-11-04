@@ -7,6 +7,8 @@ import { BudgetAllocation } from './entities/budgetAllocation.entity';
 import { BudgetCategory } from './entities/budgetCategory.entity';
 import { BudgetCategoryGroup } from './entities/budgetCategoryGroup.entity';
 import { MonthlyBudget } from './entities/monthlyBudget.entity';
+import { BudgetCategoryService } from './services/budgetCategory.service';
+import { BudgetCategoryController } from './controllers/budgetCategory.controller';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { MonthlyBudget } from './entities/monthlyBudget.entity';
       MonthlyBudget,
     ]),
   ],
-  providers: [BankAccountService],
-  controllers: [BankAccountController],
+  providers: [BankAccountService, BudgetCategoryService],
+  controllers: [BankAccountController, BudgetCategoryController],
 })
 export class BudgetModule {}

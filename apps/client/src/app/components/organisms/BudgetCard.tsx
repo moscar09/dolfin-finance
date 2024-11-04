@@ -11,8 +11,10 @@ import {
 import { IconCirclePlus } from '@tabler/icons-react';
 import React, { Fragment, useRef, useState } from 'react';
 
-import { addNewSubcategory, ApiClient } from '../../../client/ApiClient';
+import { BudgetCategoryDto } from '@dolfin-finance/api-types';
+import { ApiClient } from '../../../client/ApiClient';
 import { components } from '../../../client/schema';
+import { useBudgetCategories } from '../../hooks/query/useBudgetCategories';
 
 function BudgetCategoryTitleCell({
   name,
@@ -85,7 +87,7 @@ function SubcategoryRow({
   subcategory,
   onBudgetChange,
 }: {
-  allocation: components['schemas']['Budget Subcategory Allocation'];
+  allocation?: any;
   subcategory: components['schemas']['BudgetSubcategory'];
   onBudgetChange: (amount: number) => void;
 }) {
@@ -119,9 +121,9 @@ function SubcategoryRow({
       <Table.Td
         fw={600}
         c={
-          (allocation.remaining || 0) > 0
+          (allocation?.remaining || 0) > 0
             ? 'green'
-            : allocation.remaining === 0
+            : allocation?.remaining === 0
             ? 'orange.4'
             : 'red'
         }
@@ -138,30 +140,23 @@ function SubcategoryRow({
 }
 
 export function BudgetCard({ month, year }: { month: number; year: number }) {
-  const useSWR: any = () => {
-    return '';
-  };
-  const {
-    data: budgetAllocations,
-    isLoading: allocationsAreLoading,
-    mutate: mutateBudgetAllocations,
-  } = useSWR(`/monthly-budget/${month}-${year}`, () =>
-    ApiClient.GET('/monthly-budget/{month}-{year}', {
-      params: { path: { month, year } },
-    }).then((r) => r.data)
-  );
+  const { isPending: categoriesAreLoading, data: budgetCategories } =
+    useBudgetCategories();
+  if (categoriesAreLoading || !budgetCategories) return;
 
-  if (
-    scaffoldIsLoading ||
-    allocationsAreLoading ||
-    !budgetAllocations?.allocations
-  )
-    return;
+  const categoriesByGroup = budgetCategories.reduce((acc, category) => {
+    const group = category.group;
 
-  const budgetAllocationsBySubId = budgetAllocations.allocations.reduce(
-    (acc, item) => ({ ...acc, [item.budgetSubcategory.id]: item }),
-    {}
-  );
+    acc[group.id] ??= [];
+    acc[group.id].push(category);
+    return acc;
+  }, {} as { [key: number]: BudgetCategoryDto[] });
+  console.dir(categoriesByGroup);
+
+  // const budgetAllocationsBySubId = budgetAllocations.allocations.reduce(
+  //   (acc, item) => ({ ...acc, [item.budgetSubcategory.id]: item }),
+  //   {}
+  // );
 
   return (
     <Card radius="lg" withBorder px={0} py="xs">
@@ -176,22 +171,22 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {budgetScaffold.map(({ id, name, subcategories }) => (
-              <Fragment key={id}>
+            {Object.values(categoriesByGroup).map((categoriesInGroup) => (
+              <Fragment key={categoriesInGroup[0].group.id}>
                 <Table.Tr bg="gray.0">
                   <Table.Td colSpan={4} pl="md">
                     <BudgetCategoryTitleCell
-                      id={id}
-                      name={name}
+                      id={categoriesInGroup[0].group.id}
+                      name={categoriesInGroup[0].group.name}
                       onCategoryAdd={async (categoryName: string) => {
-                        await addNewSubcategory(id, categoryName);
-                        await mutateBudgetAllocations(budgetAllocations);
-                        await mutateBudgetScaffold(budgetScaffold);
+                        // await addNewSubcategory(id, categoryName);
+                        // await mutateBudgetAllocations(budgetAllocations);
+                        // await mutateBudgetScaffold(budgetScaffold);
                       }}
                     />
                   </Table.Td>
                 </Table.Tr>
-                {subcategories.map((subcat) => (
+                {categoriesInGroup.map((category) => (
                   <SubcategoryRow
                     onBudgetChange={async (amount) => {
                       await ApiClient.PATCH(
@@ -201,18 +196,19 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
                             path: {
                               month,
                               year,
-                              subcategoryId: subcat.id,
+                              subcategoryId: category.id,
                             },
                           },
                           body: { amount },
                         }
                       );
 
-                      mutateBudgetAllocations();
+                      // mutateBudgetAllocations();
                     }}
-                    key={subcat.id}
-                    allocation={budgetAllocationsBySubId[subcat.id]}
-                    subcategory={subcat}
+                    key={category.id}
+                    allocation={undefined}
+                    // allocation={budgetAllocationsBySubId[category.id]}
+                    subcategory={category}
                   />
                 ))}
               </Fragment>
