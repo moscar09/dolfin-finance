@@ -1,11 +1,29 @@
 import { Module } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { BudgetModule } from './budget/budget.module';
+import { BankAccountController } from './budget/controllers/bankAccount.controller';
+import { BankAccount } from './budget/entities/bankAccount.entity';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    BudgetModule,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: '127.0.0.1',
+      port: 3306,
+      username: 'dolfin',
+      password: 'dolfin',
+      database: 'dolfin',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+    BudgetModule,
+  ],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}

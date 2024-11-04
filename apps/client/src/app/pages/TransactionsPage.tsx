@@ -1,12 +1,12 @@
-import { Select, Stack, Text } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
 import useSWR from 'swr';
+import { ApiClient } from '../../client/ApiClient';
 import { CalendarPopover, DateRange } from '../molecules/CalendarPopover';
 import { PageTitle } from '../molecules/PageTitle';
 import { LayoutShell } from './layout';
-import { ApiClient, modifyTransactionDetails } from '../../client/ApiClient';
 
 export function TransactionsPage() {
   const [dateRange, setDateRange] = useState<DateRange>([
@@ -35,14 +35,14 @@ export function TransactionsPage() {
 
   if (isLoading || budgetCategoryIsLoading) return;
 
-  console.dir(transactions);
-  const subcategories = budgetCategoryData.map((category) => ({
-    group: category.name,
-    items: category.subcategories.map((sub) => ({
-      label: sub.name,
-      value: `${sub.id}`,
-    })),
-  }));
+  // console.dir(transactions);
+  // const subcategories = budgetCategoryData.map((category) => ({
+  //   group: category.name,
+  //   items: category.subcategories.map((sub) => ({
+  //     label: sub.name,
+  //     value: `${sub.id}`,
+  //   })),
+  // }));
 
   // @TODO: make it so that it shows the year properly
   return (
@@ -77,7 +77,7 @@ export function TransactionsPage() {
             {
               accessor: 'humanDescription',
               title: 'Description',
-              //@ts-expect-error
+
               render: ({ description, humanDescription }) => (
                 <Text size="sm" style={{ wordWrap: 'break-word' }}>
                   {humanDescription || description}
@@ -90,7 +90,7 @@ export function TransactionsPage() {
               title: 'Amount',
               render: ({ amount, isDebit }) => (
                 <Text size="sm" c={isDebit ? 'red' : 'green'}>
-                  {isDebit ? 0 - amount : amount}
+                  {isDebit ? 0 - (amount ?? 0) : amount}
                 </Text>
               ),
             },
@@ -98,19 +98,20 @@ export function TransactionsPage() {
               accessor: 'budgetSubcategoryId',
               title: 'Category',
               render: ({ id, budgetSubcategoryId }) => (
-                <Select
-                  size="sm"
-                  placeholder="Pick value"
-                  data={subcategories}
-                  defaultValue={`${budgetSubcategoryId}`}
-                  comboboxProps={{ width: 180, position: 'bottom-end' }}
-                  onChange={async (newCategoryId) => {
-                    await modifyTransactionDetails(
-                      { budgetSubcategoryId: Number.parseInt(newCategoryId) },
-                      id
-                    );
-                  }}
-                />
+                <>A</>
+                // <Select
+                //   size="sm"
+                //   placeholder="Pick value"
+                //   data={subcategories}
+                //   defaultValue={`${budgetSubcategoryId}`}
+                //   comboboxProps={{ width: 180, position: 'bottom-end' }}
+                //   onChange={async (newCategoryId) => {
+                //     await modifyTransactionDetails(
+                //       { budgetSubcategoryId: Number.parseInt(newCategoryId) },
+                //       id
+                //     );
+                //   }}
+                // />
               ),
             },
             {
