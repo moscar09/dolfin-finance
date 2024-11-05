@@ -1,28 +1,28 @@
-import { BudgetCategoryDto } from '@dolfin-finance/api-types';
 import {
-  Table,
-  TextInput,
-  NumberFormatter,
-  ThemeIcon,
-  Stack,
-  Group,
-  ActionIcon,
-} from '@mantine/core';
+  MonthlyBudgetAllocationState,
+  BudgetCategoryDto,
+} from '@dolfin-finance/api-types';
+import { ActionIcon, Group, Table, TextInput } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDeleteBudgetCategory } from '../../../hooks/mutations/useDeleteBudgetCategory';
+import { MoneyAmount } from '../../atoms/MoneyAmount';
+import { useUpdateBudgetAllocation } from '../../../hooks/mutations/useUpdateBudgetAllocation';
 
 export function CategoryRow({
   allocation,
   category,
-  onBudgetChange,
+  year,
+  month,
 }: {
-  allocation?: any;
+  allocation?: MonthlyBudgetAllocationState;
   category: BudgetCategoryDto;
-  onBudgetChange: (amount: number) => void;
+  year: number;
+  month: number;
 }) {
   const [isRowHovered, setIsRowHovered] = useState(false);
   const deleteBudgetCategory = useDeleteBudgetCategory();
+  const updateBudgetAllocation = useUpdateBudgetAllocation();
 
   return (
     <Table.Tr
@@ -57,34 +57,29 @@ export function CategoryRow({
             }
           }}
           onBlur={(e) => {
-            onBudgetChange(Number.parseFloat(e.target.value));
+            updateBudgetAllocation.mutate({
+              year,
+              month,
+              categoryId: category.id,
+              amount: Number.parseFloat(e.target.value),
+            });
           }}
         />
       </Table.Td>
       <Table.Td>
-        <NumberFormatter
-          prefix="€"
-          fixedDecimalScale={true}
-          decimalScale={2}
-          value={allocation?.spent || 0}
-        />
+        <MoneyAmount amount={allocation?.spent || 0} />
       </Table.Td>
       <Table.Td
         fw={600}
         c={
           (allocation?.remaining || 0) > 0
             ? 'green'
-            : allocation?.remaining === 0
+            : (allocation?.remaining || 0) === 0
             ? 'orange.4'
             : 'red'
         }
       >
-        <NumberFormatter
-          prefix="€"
-          fixedDecimalScale={true}
-          decimalScale={2}
-          value={allocation?.remaining || 0}
-        />
+        <MoneyAmount amount={allocation?.remaining || 0} />
       </Table.Td>
     </Table.Tr>
   );

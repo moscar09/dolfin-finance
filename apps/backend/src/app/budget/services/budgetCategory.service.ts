@@ -34,6 +34,10 @@ export class BudgetCategoryService {
     return category;
   }
 
+  async findById(id: number): Promise<BudgetCategory | null> {
+    return this.budgetCategoryRepository.findOneBy({ id });
+  }
+
   async delete(id: number): Promise<boolean> {
     const res = await this.budgetCategoryRepository.delete({ id });
     return res.affected > 0;

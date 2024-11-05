@@ -1,5 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BudgetCategoryGroup } from './budgetCategoryGroup.entity';
+import { BudgetAllocation } from './budgetAllocation.entity';
 
 @Entity()
 export class BudgetCategory {
@@ -11,6 +18,9 @@ export class BudgetCategory {
 
   @ManyToOne(() => BudgetCategoryGroup, (bcg) => bcg.budgetCategories)
   group: BudgetCategoryGroup;
+
+  @OneToMany(() => BudgetAllocation, (allocation) => allocation.category)
+  allocations: BudgetAllocation[];
 
   constructor(name: string, group: BudgetCategoryGroup) {
     this.name = name;

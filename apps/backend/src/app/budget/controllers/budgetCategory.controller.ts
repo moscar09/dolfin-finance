@@ -10,6 +10,7 @@ import { BudgetCategoryService } from '../services/budgetCategory.service';
 @Controller('budget-category')
 export class BudgetCategoryController {
   constructor(private budgetCategoryService: BudgetCategoryService) {}
+
   @Get()
   async findAll(): Promise<BudgetCategoryDto[]> {
     const data = await this.budgetCategoryService.findAllWithGroup();

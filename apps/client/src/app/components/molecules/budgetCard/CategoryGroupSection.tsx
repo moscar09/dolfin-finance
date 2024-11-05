@@ -1,10 +1,13 @@
-import { BudgetCategoryDto } from '@dolfin-finance/api-types';
+import {
+  MonthlyBudgetAllocationState,
+  BudgetCategoryDto,
+} from '@dolfin-finance/api-types';
 import { Button, Group, Popover, Stack, Table, TextInput } from '@mantine/core';
+import { IconCirclePlus } from '@tabler/icons-react';
+import { useRef, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useCreateBudgetCategory } from '../../../hooks/mutations/useCreateBudgetCategory';
 import { CategoryRow } from './CategoryRow';
-import { IconCirclePlus } from '@tabler/icons-react';
-import { useRef, useState } from 'react';
 
 function CategoryGroupTitleRow({
   name,
@@ -74,8 +77,14 @@ function CategoryGroupTitleRow({
 
 export function CategoryGroupSection({
   categories,
+  allocations,
+  year,
+  month,
 }: {
   categories: BudgetCategoryDto[];
+  allocations: { [categoryId: number]: MonthlyBudgetAllocationState };
+  year: number;
+  month: number;
 }) {
   const { group } = categories[0];
   const createBudgetCategory = useCreateBudgetCategory();
@@ -98,26 +107,11 @@ export function CategoryGroupSection({
       </Table.Tr>
       {categories.map((category) => (
         <CategoryRow
-          onBudgetChange={async (amount) => {
-            // await ApiClient.PATCH(
-            //   '/monthly-budget/{month}-{year}/allocation/{subcategoryId}',
-            //   {
-            //     params: {
-            //       path: {
-            //         month,
-            //         year,
-            //         subcategoryId: category.id,
-            //       },
-            //     },
-            //     body: { amount },
-            //   }
-            // );
-            // mutateBudgetAllocations();
-          }}
           key={category.id}
-          allocation={undefined}
-          // allocation={budgetAllocationsBySubId[category.id]}
+          allocation={allocations[category.id]}
           category={category}
+          year={year}
+          month={month}
         />
       ))}
     </Fragment>

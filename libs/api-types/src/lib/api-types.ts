@@ -26,3 +26,22 @@ export class CreateBudgetCategoryDto {
 export class BudgetCategoryGroupDto {
   constructor(public id: number, public name: string) {}
 }
+
+export class MonthlyBudgetDto {
+  constructor(
+    public month: number,
+    public year: number,
+    public allocations: MonthlyBudgetAllocationState[]
+  ) {}
+}
+
+export class MonthlyBudgetAllocationState {
+  public remaining: number;
+  constructor(
+    public categoryId: number,
+    public amount: number,
+    public spent: number
+  ) {
+    this.remaining = this.amount - this.spent;
+  }
+}
