@@ -11,4 +11,9 @@ export class BudgetCategory {
 
   @ManyToOne(() => BudgetCategoryGroup, (bcg) => bcg.budgetCategories)
   group: BudgetCategoryGroup;
+
+  constructor(name: string, group: BudgetCategoryGroup) {
+    this.name = name;
+    this.group = group;
+  }
 }

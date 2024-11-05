@@ -2,7 +2,7 @@
 import { Card, Title } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 import { LayoutShell } from './layout';
-import { useAccounts } from '../hooks/query/useAccounts';
+import { useAccounts } from '../hooks/queries/useAccounts';
 
 export function AccountsPage() {
   const { isPending, data } = useAccounts();

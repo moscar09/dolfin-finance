@@ -19,6 +19,10 @@ export class BudgetCategoryDto {
   ) {}
 }
 
+export class CreateBudgetCategoryDto {
+  constructor(public name: string, public groupId: number) {}
+}
+
 export class BudgetCategoryGroupDto {
   constructor(public id: number, public name: string) {}
 }

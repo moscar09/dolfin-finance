@@ -1,9 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { BudgetCategoryService } from '../services/budgetCategory.service';
 import {
   BudgetCategoryDto,
   BudgetCategoryGroupDto,
+  CreateBudgetCategoryDto,
 } from '@dolfin-finance/api-types';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { BudgetCategory } from '../entities/budgetCategory.entity';
+import { BudgetCategoryService } from '../services/budgetCategory.service';
 
 @Controller('budget-category')
 export class BudgetCategoryController {
@@ -12,13 +14,31 @@ export class BudgetCategoryController {
   async findAll(): Promise<BudgetCategoryDto[]> {
     const data = await this.budgetCategoryService.findAllWithGroup();
 
-    return data.map(
-      ({ id, name, group }) =>
-        new BudgetCategoryDto(
-          id,
-          name,
-          new BudgetCategoryGroupDto(group.id, group.name)
-        )
+    return data.map(this.budgetCategoryToDto);
+  }
+
+  @Post()
+  async createCategory(
+    @Body() { name, groupId }: CreateBudgetCategoryDto
+  ): Promise<BudgetCategoryDto> {
+    const category = await this.budgetCategoryService.create(name, groupId);
+    return this.budgetCategoryToDto(category);
+  }
+
+  @Delete(':id')
+  async deleteCategory(@Param() { id }: { id: string }): Promise<boolean> {
+    return await this.budgetCategoryService.delete(Number.parseInt(id));
+  }
+
+  private budgetCategoryToDto({
+    id,
+    name,
+    group,
+  }: BudgetCategory): BudgetCategoryDto {
+    return new BudgetCategoryDto(
+      id,
+      name,
+      new BudgetCategoryGroupDto(group.id, group.name)
     );
   }
 }

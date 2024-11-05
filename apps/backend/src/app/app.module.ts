@@ -3,8 +3,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BudgetModule } from './budget/budget.module';
-import { BankAccountController } from './budget/controllers/bankAccount.controller';
-import { BankAccount } from './budget/entities/bankAccount.entity';
 
 @Module({
   imports: [
