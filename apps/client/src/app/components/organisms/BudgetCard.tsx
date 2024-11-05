@@ -37,6 +37,8 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
       {}
     );
 
+  console.dir(allocationsByCategory);
+
   return (
     <Card radius="lg" withBorder px={0} py="xs">
       <Stack gap="md">

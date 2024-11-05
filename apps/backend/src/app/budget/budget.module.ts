@@ -11,6 +11,9 @@ import { BudgetCategoryService } from './services/budgetCategory.service';
 import { BudgetCategoryController } from './controllers/budgetCategory.controller';
 import { MonthlyBudgetService } from './services/monthlyBudget.service';
 import { MonthlyBudgetController } from './controllers/monthlyBudget.controller';
+import { Transaction } from './entities/transaction.entity';
+import { TransactionController } from './controllers/transaction.controller';
+import { TransactionService } from './services/transaction.service';
 
 @Module({
   imports: [
@@ -20,13 +23,20 @@ import { MonthlyBudgetController } from './controllers/monthlyBudget.controller'
       BudgetCategory,
       BudgetCategoryGroup,
       MonthlyBudget,
+      Transaction,
     ]),
   ],
-  providers: [BankAccountService, BudgetCategoryService, MonthlyBudgetService],
+  providers: [
+    BankAccountService,
+    BudgetCategoryService,
+    MonthlyBudgetService,
+    TransactionService,
+  ],
   controllers: [
     BankAccountController,
     BudgetCategoryController,
     MonthlyBudgetController,
+    TransactionController,
   ],
 })
 export class BudgetModule {}

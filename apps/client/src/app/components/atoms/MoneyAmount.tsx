@@ -12,7 +12,7 @@ export function MoneyAmount({
       prefix="€"
       fixedDecimalScale={true}
       decimalScale={2}
-      value={amount}
+      value={amount / 100}
     />
   );
 }

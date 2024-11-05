@@ -39,9 +39,24 @@ export class MonthlyBudgetAllocationState {
   public remaining: number;
   constructor(
     public categoryId: number,
-    public amount: number,
-    public spent: number
+    public amountCents: number,
+    public spentCents: number
   ) {
-    this.remaining = this.amount - this.spent;
+    this.remaining = this.amountCents - this.spentCents;
   }
+}
+
+export class TransactionDto {
+  constructor(
+    public id: number,
+    public referenceId: string,
+    public date: Date,
+    public description: string,
+    public humanDescription: string,
+    public isDebit: boolean,
+    public amountCents: number,
+    public budgetCategoryId: number,
+    public sourceAccount: BankAccountDto,
+    public destAccount: BankAccountDto
+  ) {}
 }

@@ -13,19 +13,21 @@ export function useUpdateBudgetAllocation() {
       month,
       year,
       categoryId,
-      ...data
+      amount,
     }: {
       month: number;
       year: number;
       categoryId: number;
       amount: number;
-    }) =>
-      axiosClient
+    }) => {
+      const amountCents = amount * 100;
+      return axiosClient
         .put<MonthlyBudgetAllocationState>(
           `/monthly-budget/${year}/${month}/${categoryId}`,
-          data
+          { amountCents }
         )
-        .then((res) => res.data),
+        .then((res) => res.data);
+    },
     onSuccess: (result, { year, month, categoryId }) => {
       queryClient.setQueryData(
         ['monthlyBudget', year, month],
@@ -40,10 +42,11 @@ export function useUpdateBudgetAllocation() {
           );
 
           if (existingAllocation) {
-            existingAllocation.amount = result.amount;
+            Object.assign(existingAllocation, result);
           } else {
             newBudget.allocations.push(result);
           }
+          console.dir(newBudget);
           return newBudget;
         }
       );

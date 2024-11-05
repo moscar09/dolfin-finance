@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { MonthlyBudget } from './monthlyBudget.entity';
 import { BudgetCategory } from './budgetCategory.entity';
+import { Transaction } from './transaction.entity';
 
 @Entity()
 export class BudgetAllocation {
@@ -14,19 +21,18 @@ export class BudgetAllocation {
   category: BudgetCategory;
 
   @Column()
-  amount: number;
+  amountCents: number;
 
-  // @OneToMany(mappedBy = "allocation")
-  // List<Transaction> transactionList = new ArrayList<>();
-  // BigDecimal amount = BigDecimal.ZERO;
+  @OneToMany(() => Transaction, (transaction) => transaction.allocation)
+  transactions: Transaction[];
 
   constructor(
     monthlyBudget: MonthlyBudget,
     category: BudgetCategory,
-    amount: number
+    amountCents: number
   ) {
     this.monthlyBudget = monthlyBudget;
     this.category = category;
-    this.amount = amount;
+    this.amountCents = amountCents;
   }
 }

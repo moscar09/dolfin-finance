@@ -29,7 +29,7 @@ export class MonthlyBudgetController {
           (allocation) =>
             new MonthlyBudgetAllocationState(
               allocation.category.id,
-              allocation.amount,
+              allocation.amountCents,
               0
             )
         )
@@ -47,18 +47,18 @@ export class MonthlyBudgetController {
     @Param('year') year: string,
     @Param('month') month: string,
     @Param('categoryId') categoryId: string,
-    @Body() { amount }: { amount: string }
+    @Body() { amountCents }: { amountCents: string }
   ): Promise<MonthlyBudgetAllocationState> {
     const allocation = await this.monthlyBudgetService.addAllocationToBudget(
       Number.parseInt(month),
       Number.parseInt(year),
       Number.parseInt(categoryId),
-      Number.parseFloat(amount)
+      Number.parseInt(amountCents)
     );
 
     return new MonthlyBudgetAllocationState(
       allocation.category.id,
-      allocation.amount,
+      allocation.amountCents,
       0
     );
   }

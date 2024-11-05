@@ -49,7 +49,7 @@ export function CategoryRow({
         <TextInput
           size="xs"
           w={80}
-          defaultValue={allocation?.amount || 0}
+          defaultValue={(allocation?.amountCents || 0) / 100}
           leftSection="€"
           onKeyDown={(e) => {
             if (e.code === 'Enter') {
@@ -67,7 +67,7 @@ export function CategoryRow({
         />
       </Table.Td>
       <Table.Td>
-        <MoneyAmount amount={allocation?.spent || 0} />
+        <MoneyAmount amount={allocation?.spentCents || 0} />
       </Table.Td>
       <Table.Td
         fw={600}

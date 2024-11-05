@@ -1,15 +1,16 @@
-import { Stack, Text } from '@mantine/core';
+import { Select, Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
 
-import { ApiClient } from '../../client/ApiClient';
 import {
   CalendarPopover,
   DateRange,
 } from '../components/molecules/CalendarPopover';
 import { PageTitle } from '../components/molecules/PageTitle';
 import { LayoutShell } from './layout';
+import { useBudgetCategories } from '../hooks/queries/useBudgetCategories';
+import { useTransactions } from '../hooks/queries/useTransactions';
 
 export function TransactionsPage() {
   const [dateRange, setDateRange] = useState<DateRange>([
@@ -17,35 +18,16 @@ export function TransactionsPage() {
     dayjs().endOf('d'),
   ]);
   const [startDate, endDate] = dateRange;
-  const { data: transactions, isLoading } = useSWR(
-    `/transaction?${startDate.format('YYYY-MM-DD')}&${endDate.format(
-      'YYYY-MM-DD'
-    )}`,
-    () =>
-      ApiClient.GET('/transaction', {
-        params: {
-          query: {
-            startDate: startDate.format('YYYY-MM-DD'),
-            endDate: endDate.format('YYYY-MM-DD'),
-          },
-        },
-      }).then((r) => r.data)
-  );
-  const { data: budgetCategoryData, isLoading: budgetCategoryIsLoading } =
-    useSWR('/api/budget-category', (...args) =>
-      fetch(...args).then((res) => res.json())
-    );
 
-  if (isLoading || budgetCategoryIsLoading) return;
+  const { isPending: budgetCategoriesLoading, data: budgetCategories } =
+    useBudgetCategories();
+  const { isPending: transactionsLoading, data: transactions } =
+    useTransactions(...dateRange);
+
+  if (budgetCategoriesLoading || transactionsLoading || !budgetCategories)
+    return;
 
   // console.dir(transactions);
-  // const subcategories = budgetCategoryData.map((category) => ({
-  //   group: category.name,
-  //   items: category.subcategories.map((sub) => ({
-  //     label: sub.name,
-  //     value: `${sub.id}`,
-  //   })),
-  // }));
 
   // @TODO: make it so that it shows the year properly
   return (
@@ -69,7 +51,7 @@ export function TransactionsPage() {
           borderRadius="sm"
           withColumnBorders
           striped
-          fetching={isLoading}
+          fetching={transactionsLoading}
           highlightOnHover
           records={transactions}
           columns={[
@@ -91,30 +73,32 @@ export function TransactionsPage() {
             {
               accessor: 'amount',
               title: 'Amount',
-              render: ({ amount, isDebit }) => (
+              render: ({ amountCents, isDebit }) => (
                 <Text size="sm" c={isDebit ? 'red' : 'green'}>
-                  {isDebit ? 0 - (amount ?? 0) : amount}
+                  {isDebit ? 0 - (amountCents ?? 0) : amountCents}
                 </Text>
               ),
             },
             {
               accessor: 'budgetSubcategoryId',
               title: 'Category',
-              render: ({ id, budgetSubcategoryId }) => (
-                <>A</>
-                // <Select
-                //   size="sm"
-                //   placeholder="Pick value"
-                //   data={subcategories}
-                //   defaultValue={`${budgetSubcategoryId}`}
-                //   comboboxProps={{ width: 180, position: 'bottom-end' }}
-                //   onChange={async (newCategoryId) => {
-                //     await modifyTransactionDetails(
-                //       { budgetSubcategoryId: Number.parseInt(newCategoryId) },
-                //       id
-                //     );
-                //   }}
-                // />
+              render: ({ id, budgetCategoryId }) => (
+                <Select
+                  size="sm"
+                  placeholder="Pick value"
+                  data={budgetCategories.map((category) => ({
+                    value: `${category.id}`,
+                    label: category.name,
+                  }))}
+                  defaultValue={`${budgetCategoryId}`}
+                  comboboxProps={{ width: 180, position: 'bottom-end' }}
+                  // onChange={async (newCategoryId) => {
+                  //   await modifyTransactionDetails(
+                  //     { budgetSubcategoryId: Number.parseInt(newCategoryId) },
+                  //     id
+                  //   );
+                  // }}
+                />
               ),
             },
             {

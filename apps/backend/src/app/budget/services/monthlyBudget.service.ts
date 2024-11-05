@@ -26,7 +26,7 @@ export class MonthlyBudgetService {
     month: number,
     year: number,
     categoryId: number,
-    amount: number
+    amountCents: number
   ) {
     let monthlyBudget = await this.findByMMYY(month, year);
 
@@ -41,10 +41,10 @@ export class MonthlyBudgetService {
     );
 
     if (allocation) {
-      allocation.amount = amount;
+      allocation.amountCents = amountCents;
     } else {
       const category = await this.budgetCategoryService.findById(categoryId);
-      allocation = new BudgetAllocation(monthlyBudget, category, amount);
+      allocation = new BudgetAllocation(monthlyBudget, category, amountCents);
     }
 
     return this.budgetAllocationRepository.save(allocation);
