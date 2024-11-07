@@ -13,11 +13,11 @@ export class Transaction {
   @Column()
   date: Date;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
-  @Column()
-  humanDescription: string;
+  @Column({ type: 'text', nullable: true })
+  humanDescription?: string;
 
   @Column()
   isDebit: boolean;
@@ -25,46 +25,32 @@ export class Transaction {
   @Column({ type: 'int' })
   amountCents: number;
 
-  @ManyToOne(() => BankAccount)
-  sourceAccount: BankAccount;
+  @ManyToOne(() => BankAccount, { nullable: true })
+  sourceAccount?: BankAccount;
 
-  @ManyToOne(() => BankAccount)
-  destAccount: BankAccount;
+  @ManyToOne(() => BankAccount, { nullable: true })
+  destAccount?: BankAccount;
 
   @ManyToOne(() => BudgetAllocation, { nullable: true })
   allocation?: BudgetAllocation;
+
+  constructor(
+    referenceId: string,
+    date: Date,
+    description: string,
+    humanDescription: string,
+    isDebit: boolean,
+    amountCents: number,
+    sourceAccount?: BankAccount,
+    destAccount?: BankAccount
+  ) {
+    this.referenceId = referenceId;
+    this.date = date;
+    this.description = description;
+    this.humanDescription = humanDescription;
+    this.isDebit = isDebit;
+    this.amountCents = amountCents;
+    this.sourceAccount = sourceAccount;
+    this.destAccount = destAccount;
+  }
 }
-/**
- *   @Id
-    @GeneratedValue
-    Long id;
-
-    String referenceId;
-    LocalDate date;
-
-    @Column(columnDefinition = "TEXT")
-    String description;
-    String humanDescription;
-    Boolean isDebit;
-
-    @Column(columnDefinition = "DECIMAL(10,2)")
-    BigDecimal amount;
-
-    @ManyToOne
-    @JoinColumn(name = "source_account_id")
-    @ToString.Exclude
-
-    BankAccount sourceAccount;
-
-    @ManyToOne
-    @JoinColumn(name = "dest_account_id")
-    @ToString.Exclude
-
-    BankAccount destAccount;
-
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "allocation_id")
-    @ToString.Exclude
-    BudgetAllocation allocation;
- */

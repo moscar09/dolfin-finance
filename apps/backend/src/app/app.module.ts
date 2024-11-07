@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BudgetModule } from './budget/budget.module';
+import { BankStatementParserModule } from './bank-statement-parser/bank-statement-parser.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BudgetModule } from './budget/budget.module';
       synchronize: true,
     }),
     BudgetModule,
+    BankStatementParserModule,
   ],
   controllers: [],
   providers: [],

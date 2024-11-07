@@ -1,126 +1,125 @@
-import { Select, Stack, Text } from '@mantine/core';
-import dayjs from 'dayjs';
-import { DataTable } from 'mantine-datatable';
+import { Box, Button, Collapse, Group, rem, Stack, Text } from '@mantine/core';
+import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
+import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import {
-  CalendarPopover,
-  DateRange,
-} from '../components/molecules/CalendarPopover';
+  IconCaretDownFilled,
+  IconFile,
+  IconUpload,
+  IconX,
+} from '@tabler/icons-react';
+import { CalendarPopover } from '../components/molecules/CalendarPopover';
 import { PageTitle } from '../components/molecules/PageTitle';
+import { TransactionsCard } from '../components/organisms/TransactionsCard';
 import { LayoutShell } from './layout';
-import { useBudgetCategories } from '../hooks/queries/useBudgetCategories';
-import { useTransactions } from '../hooks/queries/useTransactions';
+import { axiosClient } from '../utils/axiosClient';
 
 export function TransactionsPage() {
-  const [dateRange, setDateRange] = useState<DateRange>([
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([
     dayjs().startOf('d').subtract(3, 'month'),
     dayjs().endOf('d'),
   ]);
+
+  const [dropzoneExpanded, setDropzoneExpanded] = useState(false);
   const [startDate, endDate] = dateRange;
 
-  const { isPending: budgetCategoriesLoading, data: budgetCategories } =
-    useBudgetCategories();
-  const { isPending: transactionsLoading, data: transactions } =
-    useTransactions(...dateRange);
-
-  if (budgetCategoriesLoading || transactionsLoading || !budgetCategories)
-    return;
-
-  // console.dir(transactions);
-
-  // @TODO: make it so that it shows the year properly
   return (
     <LayoutShell>
       <Stack gap="md">
-        <PageTitle
-          title="Your transactions between"
-          subtitle={`${startDate.format('MMMM D')} - ${endDate.format(
-            'MMMM D'
-          )}`}
-          endButton={
-            <CalendarPopover
-              startDate={startDate}
-              endDate={endDate}
-              setDateRange={setDateRange}
-            />
-          }
-        />
-        <DataTable
-          withTableBorder
-          borderRadius="sm"
-          withColumnBorders
-          striped
-          fetching={transactionsLoading}
-          highlightOnHover
-          records={transactions}
-          columns={[
-            {
-              accessor: 'date',
-              title: 'Date',
-            },
-            {
-              accessor: 'humanDescription',
-              title: 'Description',
-
-              render: ({ description, humanDescription }) => (
-                <Text size="sm" style={{ wordWrap: 'break-word' }}>
-                  {humanDescription || description}
+        <Group justify="space-between" align="end">
+          <PageTitle
+            title="Your transactions between"
+            subtitle={`${startDate.format('MMMM D')} - ${endDate.format(
+              'MMMM D'
+            )}`}
+            endButton={
+              <CalendarPopover
+                startDate={startDate}
+                endDate={endDate}
+                setDateRange={(start, end) => setDateRange([start, end])}
+              />
+            }
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setDropzoneExpanded(!dropzoneExpanded)}
+            rightSection={
+              <IconCaretDownFilled
+                style={{
+                  transform: `rotate(${dropzoneExpanded ? '180deg' : '0deg'})`,
+                  transitionDuration: '0.3s',
+                  transitionProperty: 'transform',
+                }}
+                width="70%"
+              />
+            }
+          >
+            Add transactions
+          </Button>
+        </Group>
+        <Box>
+          <Collapse in={dropzoneExpanded} transitionDuration={300}>
+            <Dropzone
+              my="md"
+              onDrop={(files) => {
+                const fd = new FormData();
+                fd.append('transactions', files[0]);
+                axiosClient.post('/transaction/upload', fd, {
+                  headers: {
+                    'Content-Type': 'multipart/form-data',
+                  },
+                });
+              }}
+              onReject={(files) => console.log('rejected files', files)}
+              maxSize={5 * 1024 ** 2}
+              accept={[
+                MIME_TYPES['7z'],
+                MIME_TYPES.zip,
+                MIME_TYPES.rar,
+                'text/xml',
+              ]}
+            >
+              <Group justify="center" h="100px">
+                <Dropzone.Accept>
+                  <IconUpload
+                    style={{
+                      width: rem(32),
+                      height: rem(32),
+                      color: 'var(--mantine-color-green-6)',
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX
+                    style={{
+                      width: rem(32),
+                      height: rem(32),
+                      color: 'var(--mantine-color-red-6)',
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <IconFile
+                    style={{
+                      width: rem(32),
+                      height: rem(32),
+                      color: 'var(--mantine-color-dimmed)',
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Idle>
+                <Text fw={600} size="lg" c="dimmed">
+                  Drop your CAMT.053 export file here
                 </Text>
-              ),
-              width: '25%',
-            },
-            {
-              accessor: 'amount',
-              title: 'Amount',
-              render: ({ amountCents, isDebit }) => (
-                <Text size="sm" c={isDebit ? 'red' : 'green'}>
-                  {isDebit ? 0 - (amountCents ?? 0) : amountCents}
-                </Text>
-              ),
-            },
-            {
-              accessor: 'budgetSubcategoryId',
-              title: 'Category',
-              render: ({ id, budgetCategoryId }) => (
-                <Select
-                  size="sm"
-                  placeholder="Pick value"
-                  data={budgetCategories.map((category) => ({
-                    value: `${category.id}`,
-                    label: category.name,
-                  }))}
-                  defaultValue={`${budgetCategoryId}`}
-                  comboboxProps={{ width: 180, position: 'bottom-end' }}
-                  // onChange={async (newCategoryId) => {
-                  //   await modifyTransactionDetails(
-                  //     { budgetSubcategoryId: Number.parseInt(newCategoryId) },
-                  //     id
-                  //   );
-                  // }}
-                />
-              ),
-            },
-            {
-              accessor: 'sourceAccount',
-              title: 'From',
-              render: ({ sourceAccount }) => (
-                <Text size="xs">
-                  {sourceAccount?.prettyName || sourceAccount?.name || '-'}
-                </Text>
-              ),
-            },
-            {
-              accessor: 'destAccount',
-              title: 'To',
-              render: ({ destAccount }) => (
-                <Text size="xs">
-                  {destAccount?.prettyName || destAccount?.name || '-'}
-                </Text>
-              ),
-            },
-          ]}
-        />
+              </Group>
+            </Dropzone>
+          </Collapse>
+          <TransactionsCard startDate={startDate} endDate={endDate} />
+        </Box>
       </Stack>
     </LayoutShell>
   );

@@ -5,8 +5,6 @@ import { IconCalendarFilled } from '@tabler/icons-react';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
-export type DateRange = [Dayjs, Dayjs];
-
 export function CalendarPopover({
   startDate,
   endDate,
@@ -14,7 +12,7 @@ export function CalendarPopover({
 }: {
   startDate: Dayjs;
   endDate: Dayjs;
-  setDateRange: (dateRange: DateRange) => void;
+  setDateRange: (startDate: Dayjs, endDate: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
   return (
@@ -43,7 +41,7 @@ export function CalendarPopover({
             defaultValue={[startDate.toDate(), endDate.toDate()]}
             onChange={([startDate, endDate]) => {
               if (startDate && endDate) {
-                setDateRange([dayjs(startDate), dayjs(endDate)]);
+                setDateRange(dayjs(startDate), dayjs(endDate));
                 setOpened(false);
               }
             }}

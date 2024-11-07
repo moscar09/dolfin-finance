@@ -55,8 +55,8 @@ export class TransactionDto {
     public humanDescription: string,
     public isDebit: boolean,
     public amountCents: number,
-    public budgetCategoryId: number,
-    public sourceAccount: BankAccountDto,
-    public destAccount: BankAccountDto
+    public budgetCategoryId?: number,
+    public sourceAccount?: BankAccountDto,
+    public destAccount?: BankAccountDto
   ) {}
 }

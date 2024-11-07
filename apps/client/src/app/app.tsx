@@ -1,6 +1,7 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/dropzone/styles.css';
 import 'mantine-datatable/styles.layer.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
