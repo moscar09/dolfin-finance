@@ -22,20 +22,35 @@ export class MonthlyBudgetService {
     });
   }
 
-  async addAllocationToBudget(
+  createByMMYY(month: number, year: number): Promise<MonthlyBudget> {
+    return this.monthlyBudgetRepository.save(new MonthlyBudget(month, year), {
+      reload: true,
+    });
+  }
+
+  async findOrCreateByMMYY(
     month: number,
-    year: number,
+    year: number
+  ): Promise<MonthlyBudget> {
+    const budget = await this.findByMMYY(month, year);
+    return budget || this.createByMMYY(month, year);
+  }
+
+  getAllocation(
+    monthlyBudget: MonthlyBudget,
+    categoryId: number
+  ): BudgetAllocation | undefined {
+    const [allocation] = monthlyBudget.allocations.filter(
+      ({ category }) => category.id === categoryId
+    );
+    return allocation;
+  }
+
+  async addAllocation(
+    monthlyBudget: MonthlyBudget,
     categoryId: number,
     amountCents: number
   ) {
-    let monthlyBudget = await this.findByMMYY(month, year);
-
-    if (!monthlyBudget) {
-      monthlyBudget = await this.monthlyBudgetRepository.save(
-        new MonthlyBudget(month, year)
-      );
-    }
-
     let [allocation] = monthlyBudget.allocations.filter(
       ({ category }) => category.id === categoryId
     );

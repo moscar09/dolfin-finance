@@ -4,6 +4,7 @@ import { useTransactions } from '../../hooks/queries/useTransactions';
 import { Select, Text } from '@mantine/core';
 import { Dayjs } from 'dayjs';
 import currency from 'currency.js';
+import { usePatchTransaction } from '../../hooks/mutations/usePatchTransaction';
 
 export function TransactionsCard({
   startDate,
@@ -16,6 +17,8 @@ export function TransactionsCard({
     useBudgetCategories();
   const { isPending: transactionsLoading, data: transactions } =
     useTransactions(startDate, endDate);
+
+  const patchTransaction = usePatchTransaction();
 
   if (budgetCategoriesLoading || transactionsLoading || !budgetCategories)
     return;
@@ -69,6 +72,14 @@ export function TransactionsCard({
               }))}
               defaultValue={`${budgetCategoryId}`}
               comboboxProps={{ width: 180, position: 'bottom-end' }}
+              onChange={(v) =>
+                v
+                  ? patchTransaction.mutate({
+                      transactionId: id,
+                      categoryId: Number.parseInt(v),
+                    })
+                  : null
+              }
             />
           ),
         },

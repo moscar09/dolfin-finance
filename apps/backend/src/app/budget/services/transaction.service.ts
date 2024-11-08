@@ -5,6 +5,7 @@ import { Between, Repository } from 'typeorm';
 import { ParsedTransactionDto } from '../../bank-statement-parser/dto/parsedTransaction.dto';
 import { BankAccount } from '../entities/bankAccount.entity';
 import { Transaction } from '../entities/transaction.entity';
+import { MonthlyBudgetService } from './monthlyBudget.service';
 
 @Injectable()
 export class TransactionService {
@@ -12,14 +13,42 @@ export class TransactionService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(BankAccount)
-    private bankAccountRepository: Repository<BankAccount>
+    private bankAccountRepository: Repository<BankAccount>,
+    private monthlyBudgetService: MonthlyBudgetService
   ) {}
 
   async getTransactionsBetweenDates(startDate: Date, endDate: Date) {
     return this.transactionRepository.find({
       where: { date: Between(startDate, endDate) },
-      relations: ['sourceAccount', 'destAccount'],
+      relations: [
+        'sourceAccount',
+        'destAccount',
+        'allocation',
+        'allocation.category',
+      ],
     });
+  }
+
+  async categorizeTransaction(transactionId: number, categoryId: number) {
+    const transaction = await this.transactionRepository.findOneByOrFail({
+      id: transactionId,
+    });
+
+    const transactionMonth = transaction.date.getMonth();
+    const transactionDay = transaction.date.getDay();
+
+    const budget = await this.monthlyBudgetService.findOrCreateByMMYY(
+      transactionMonth,
+      transactionDay
+    );
+
+    const budgetAllocation =
+      this.monthlyBudgetService.getAllocation(budget, categoryId) ||
+      (await this.monthlyBudgetService.addAllocation(budget, categoryId, 0));
+
+    transaction.allocation = budgetAllocation;
+
+    return this.transactionRepository.save(transaction);
   }
 
   async saveBulkTransactions(transactionsDto: ParsedTransactionDto[]) {

@@ -1,7 +1,14 @@
-import { BankAccountDto, TransactionDto } from '@dolfin-finance/api-types';
 import {
+  BankAccountDto,
+  PatchTransactionDto,
+  TransactionDto,
+} from '@dolfin-finance/api-types';
+import {
+  Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -42,7 +49,7 @@ export class TransactionController {
           transaction.humanDescription,
           transaction.isDebit,
           transaction.amountCents,
-          undefined,
+          transaction.allocation?.category.id,
           transaction.sourceAccount
             ? new BankAccountDto(
                 transaction.sourceAccount.id,
@@ -66,6 +73,46 @@ export class TransactionController {
     );
   }
 
+  @Patch(':id')
+  async patchTransaction(
+    @Param('id') id: string,
+    @Body() { categoryId }: PatchTransactionDto
+  ): Promise<TransactionDto> {
+    const transaction = await this.transactionService.categorizeTransaction(
+      Number.parseInt(id),
+      Number.parseInt(categoryId as unknown as string)
+    );
+
+    return new TransactionDto(
+      transaction.id,
+      transaction.referenceId,
+      transaction.date.toISOString().split('T')[0],
+      transaction.description,
+      transaction.humanDescription,
+      transaction.isDebit,
+      transaction.amountCents,
+      undefined,
+      transaction.sourceAccount
+        ? new BankAccountDto(
+            transaction.sourceAccount.id,
+            transaction.sourceAccount.name,
+            transaction.sourceAccount.prettyName,
+            transaction.sourceAccount.identifier,
+            transaction.sourceAccount.type
+          )
+        : undefined,
+
+      transaction.destAccount
+        ? new BankAccountDto(
+            transaction.destAccount.id,
+            transaction.destAccount.name,
+            transaction.destAccount.prettyName,
+            transaction.destAccount.identifier,
+            transaction.destAccount.type
+          )
+        : undefined
+    );
+  }
   @Post('upload')
   @UseInterceptors(FileInterceptor('transactions'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {

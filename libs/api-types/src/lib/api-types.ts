@@ -48,6 +48,10 @@ export class MonthlyBudgetAllocationState {
   }
 }
 
+export class PatchTransactionDto {
+  constructor(public categoryId: number) {}
+}
+
 export class TransactionDto {
   constructor(
     public id: number,

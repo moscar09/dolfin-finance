@@ -49,9 +49,11 @@ export class MonthlyBudgetController {
     @Param('categoryId') categoryId: string,
     @Body() { amountCents }: { amountCents: string }
   ): Promise<MonthlyBudgetAllocationState> {
-    const allocation = await this.monthlyBudgetService.addAllocationToBudget(
-      Number.parseInt(month),
-      Number.parseInt(year),
+    const allocation = await this.monthlyBudgetService.addAllocation(
+      await this.monthlyBudgetService.findOrCreateByMMYY(
+        Number.parseInt(month),
+        Number.parseInt(year)
+      ),
       Number.parseInt(categoryId),
       Number.parseInt(amountCents)
     );
