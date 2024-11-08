@@ -4,6 +4,7 @@ import {
 } from '@dolfin-finance/api-types';
 import {
   ActionIcon,
+  Checkbox,
   Group,
   rem,
   Skeleton,
@@ -40,7 +41,7 @@ export function CategoryRow({
       onMouseEnter={() => setIsRowHovered(true)}
       onMouseLeave={() => setIsRowHovered(false)}
     >
-      <Table.Td pl="md">
+      <Table.Td>
         <Group gap="sm">
           {category.name}
           {isRowHovered && (

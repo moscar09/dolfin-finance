@@ -2,8 +2,21 @@ import {
   MonthlyBudgetAllocationState,
   BudgetCategoryDto,
 } from '@dolfin-finance/api-types';
-import { Button, Group, Popover, Stack, Table, TextInput } from '@mantine/core';
-import { IconCirclePlus } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Popover,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+} from '@mantine/core';
+import {
+  IconCaretDown,
+  IconCaretDownFilled,
+  IconCirclePlus,
+} from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useCreateBudgetCategory } from '../../../hooks/mutations/useCreateBudgetCategory';
@@ -22,7 +35,7 @@ function CategoryGroupTitleRow({
 
   return (
     <Group gap="0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-      {name}
+      <Text size="sm">{name}</Text>
 
       <Popover
         width={300}

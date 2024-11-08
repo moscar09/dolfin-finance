@@ -1,4 +1,5 @@
-import { MantineStyleProps, NumberFormatter } from '@mantine/core';
+import { MantineStyleProps } from '@mantine/core';
+import currency from 'currency.js';
 
 export function MoneyAmount({
   amount,
@@ -7,12 +8,5 @@ export function MoneyAmount({
   fw?: MantineStyleProps['fw'];
   colored?: boolean;
 }) {
-  return (
-    <NumberFormatter
-      prefix="€"
-      fixedDecimalScale={true}
-      decimalScale={2}
-      value={amount / 100}
-    />
-  );
+  return currency(amount, { fromCents: true }).format({ symbol: '€' });
 }
