@@ -38,13 +38,13 @@ export class MonthlyBudgetDto {
 }
 
 export class MonthlyBudgetAllocationState {
-  public remaining: number;
+  public remainingCents: number;
   constructor(
     public categoryId: number,
     public amountCents: number,
     public spentCents: number
   ) {
-    this.remaining = this.amountCents - this.spentCents;
+    this.remainingCents = this.amountCents - this.spentCents;
   }
 }
 

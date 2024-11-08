@@ -38,7 +38,7 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
     );
 
   return (
-    <Card radius="lg" withBorder px={0} py="xs">
+    <Card radius="lg" withBorder px={0} py={0}>
       <Stack gap="md">
         <Table>
           <Table.Thead>

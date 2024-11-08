@@ -72,14 +72,14 @@ export function CategoryRow({
       <Table.Td
         fw={600}
         c={
-          (allocation?.remaining || 0) > 0
+          (allocation?.remainingCents || 0) > 0
             ? 'green'
-            : (allocation?.remaining || 0) === 0
+            : (allocation?.remainingCents || 0) === 0
             ? 'orange.4'
             : 'red'
         }
       >
-        <MoneyAmount amount={allocation?.remaining || 0} />
+        <MoneyAmount amount={allocation?.remainingCents || 0} />
       </Table.Td>
     </Table.Tr>
   );
