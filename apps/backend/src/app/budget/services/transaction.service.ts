@@ -18,6 +18,7 @@ export class TransactionService {
   async getTransactionsBetweenDates(startDate: Date, endDate: Date) {
     return this.transactionRepository.find({
       where: { date: Between(startDate, endDate) },
+      relations: ['sourceAccount', 'destAccount'],
     });
   }
 
@@ -81,7 +82,7 @@ export class TransactionService {
           description,
           humanDescription,
           isDebit,
-          amount.cents(),
+          amount.intValue,
           sourceAccount,
           destAccount
         )

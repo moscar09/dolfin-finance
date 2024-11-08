@@ -1,4 +1,4 @@
-import { TransactionDto } from '@dolfin-finance/api-types';
+import { BankAccountDto, TransactionDto } from '@dolfin-finance/api-types';
 import {
   Controller,
   Get,
@@ -37,11 +37,31 @@ export class TransactionController {
         new TransactionDto(
           transaction.id,
           transaction.referenceId,
-          transaction.date,
+          transaction.date.toISOString().split('T')[0],
           transaction.description,
           transaction.humanDescription,
           transaction.isDebit,
-          transaction.amountCents
+          transaction.amountCents,
+          undefined,
+          transaction.sourceAccount
+            ? new BankAccountDto(
+                transaction.sourceAccount.id,
+                transaction.sourceAccount.name,
+                transaction.sourceAccount.prettyName,
+                transaction.sourceAccount.identifier,
+                transaction.sourceAccount.type
+              )
+            : undefined,
+
+          transaction.destAccount
+            ? new BankAccountDto(
+                transaction.destAccount.id,
+                transaction.destAccount.name,
+                transaction.destAccount.prettyName,
+                transaction.destAccount.identifier,
+                transaction.destAccount.type
+              )
+            : undefined
         )
     );
   }

@@ -31,7 +31,7 @@ export class Camt053ParserService {
     const transactionData = new ParsedTransactionDto();
     transactionData.accountOwner = accountOwner;
     transactionData.date = entry.bookingDate;
-    transactionData.amount = currency(entry.amount);
+    transactionData.amount = currency(entry.amount, { fromCents: true });
     transactionData.isDebit = entry.creditDebitIndicator === 'debit';
     transactionData.description = entry.additionalInformation;
 

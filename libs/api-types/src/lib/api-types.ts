@@ -4,11 +4,13 @@ export enum BankAccountType {
 }
 
 export class BankAccountDto {
-  id: number;
-  name: string;
-  prettyName: string;
-  identifier: string;
-  type: BankAccountType;
+  constructor(
+    public id: number,
+    public name: string,
+    public prettyName: string,
+    public identifier: string,
+    public type: BankAccountType
+  ) {}
 }
 
 export class BudgetCategoryDto {
@@ -50,7 +52,7 @@ export class TransactionDto {
   constructor(
     public id: number,
     public referenceId: string,
-    public date: Date,
+    public date: string,
     public description: string,
     public humanDescription: string,
     public isDebit: boolean,

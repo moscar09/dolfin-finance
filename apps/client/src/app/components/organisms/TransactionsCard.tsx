@@ -3,6 +3,7 @@ import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
 import { useTransactions } from '../../hooks/queries/useTransactions';
 import { Select, Text } from '@mantine/core';
 import { Dayjs } from 'dayjs';
+import currency from 'currency.js';
 
 export function TransactionsCard({
   startDate,
@@ -32,6 +33,7 @@ export function TransactionsCard({
         {
           accessor: 'date',
           title: 'Date',
+          width: '7rem',
         },
         {
           accessor: 'humanDescription',
@@ -42,14 +44,15 @@ export function TransactionsCard({
               {humanDescription || description}
             </Text>
           ),
-          width: '25%',
         },
         {
           accessor: 'amount',
           title: 'Amount',
           render: ({ amountCents, isDebit }) => (
             <Text size="sm" c={isDebit ? 'red' : 'green'}>
-              {isDebit ? 0 - (amountCents ?? 0) : amountCents}
+              {currency(isDebit ? 0 - amountCents : amountCents, {
+                fromCents: true,
+              }).toString()}
             </Text>
           ),
         },
@@ -66,12 +69,6 @@ export function TransactionsCard({
               }))}
               defaultValue={`${budgetCategoryId}`}
               comboboxProps={{ width: 180, position: 'bottom-end' }}
-              // onChange={async (newCategoryId) => {
-              //   await modifyTransactionDetails(
-              //     { budgetSubcategoryId: Number.parseInt(newCategoryId) },
-              //     id
-              //   );
-              // }}
             />
           ),
         },
