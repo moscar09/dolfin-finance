@@ -16,7 +16,8 @@ export class MonthlyBudgetController {
   ): Promise<MonthlyBudgetDto> {
     const budget = await this.monthlyBudgetService.findByMMYY(
       Number.parseInt(month),
-      Number.parseInt(year)
+      Number.parseInt(year),
+      true
     );
 
     if (budget) {
@@ -30,7 +31,10 @@ export class MonthlyBudgetController {
             new MonthlyBudgetAllocationState(
               allocation.category.id,
               allocation.amountCents,
-              0
+              allocation.transactions.reduce(
+                (acc, transaction) => acc + transaction.amountCents,
+                0
+              )
             )
         )
       );

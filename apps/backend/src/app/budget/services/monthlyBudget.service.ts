@@ -15,10 +15,16 @@ export class MonthlyBudgetService {
     private budgetCategoryService: BudgetCategoryService
   ) {}
 
-  findByMMYY(month: number, year: number): Promise<MonthlyBudget> {
+  findByMMYY(
+    month: number,
+    year: number,
+    withTransactions?: boolean
+  ): Promise<MonthlyBudget> {
+    const relations = ['allocations', 'allocations.category'];
+    if (withTransactions) relations.push('allocations.transactions');
     return this.monthlyBudgetRepository.findOne({
       where: { month, year },
-      relations: ['allocations', 'allocations.category'],
+      relations,
     });
   }
 

@@ -34,12 +34,12 @@ export class TransactionService {
       id: transactionId,
     });
 
-    const transactionMonth = transaction.date.getMonth();
-    const transactionDay = transaction.date.getDay();
+    const transactionMonth = transaction.date.getUTCMonth() + 1;
+    const transactionYear = transaction.date.getFullYear();
 
     const budget = await this.monthlyBudgetService.findOrCreateByMMYY(
       transactionMonth,
-      transactionDay
+      transactionYear
     );
 
     const budgetAllocation =

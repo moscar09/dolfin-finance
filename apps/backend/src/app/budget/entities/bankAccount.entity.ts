@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+} from 'typeorm';
 import { type BankAccountType } from '@dolfin-finance/api-types';
 
 @Entity()

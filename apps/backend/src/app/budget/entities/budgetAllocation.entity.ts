@@ -1,4 +1,7 @@
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -34,5 +37,14 @@ export class BudgetAllocation {
     this.monthlyBudget = monthlyBudget;
     this.category = category;
     this.amountCents = amountCents;
+  }
+
+  @AfterLoad()
+  @AfterInsert()
+  @AfterUpdate()
+  async nullChecks() {
+    if (!this.transactions) {
+      this.transactions = [];
+    }
   }
 }
