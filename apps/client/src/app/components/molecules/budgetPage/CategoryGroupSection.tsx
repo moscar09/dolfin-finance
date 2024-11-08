@@ -80,9 +80,11 @@ export function CategoryGroupSection({
   allocations,
   year,
   month,
+  isPending,
 }: {
   categories: BudgetCategoryDto[];
-  allocations: { [categoryId: number]: MonthlyBudgetAllocationState };
+  allocations?: { [categoryId: number]: MonthlyBudgetAllocationState };
+  isPending: boolean;
   year: number;
   month: number;
 }) {
@@ -108,7 +110,8 @@ export function CategoryGroupSection({
       {categories.map((category) => (
         <CategoryRow
           key={category.id}
-          allocation={allocations[category.id]}
+          isPending={isPending}
+          allocation={allocations?.[category.id]}
           category={category}
           year={year}
           month={month}

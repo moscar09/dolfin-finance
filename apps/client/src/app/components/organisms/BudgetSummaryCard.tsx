@@ -1,35 +1,6 @@
-import { Card, Divider, Grid, Skeleton, Text } from '@mantine/core';
+import { Card, Divider, Text } from '@mantine/core';
 import { useMonthlyBudget } from '../../hooks/queries/useMonthlyBudget';
-import { MoneyAmount } from '../atoms/MoneyAmount';
-
-function SummaryRow({
-  label,
-  amount,
-  isPending,
-}: {
-  label: string;
-  amount: number;
-  isPending: boolean;
-}) {
-  return (
-    <>
-      <Grid.Col span={8}>
-        <Text size="sm" c="gray.7">
-          {label}:
-        </Text>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        {isPending ? (
-          <Skeleton width="100%" height="100%" />
-        ) : (
-          <Text size="sm" fw={500} style={{ textAlign: 'end' }}>
-            <MoneyAmount amount={amount} />
-          </Text>
-        )}
-      </Grid.Col>
-    </>
-  );
-}
+import { SummaryGrid } from '../molecules/budgetPage/SummaryGrid';
 
 export function BudgetSummaryCard({
   month,
@@ -58,23 +29,11 @@ export function BudgetSummaryCard({
       </Text>
       <Divider />
 
-      <Grid gutter="xs" pt="xs">
-        <SummaryRow
-          label="Total Budgeted"
-          amount={allocatedCents}
-          isPending={isPending}
-        />
-        <SummaryRow
-          label="Total Spent"
-          amount={spentCents}
-          isPending={isPending}
-        />
-        <SummaryRow
-          label="Total Remaining"
-          amount={remainingCents}
-          isPending={isPending}
-        />
-      </Grid>
+      {isPending ? (
+        <SummaryGrid />
+      ) : (
+        <SummaryGrid {...{ allocatedCents, spentCents, remainingCents }} />
+      )}
     </Card>
   );
 }

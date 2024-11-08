@@ -5,25 +5,19 @@ import {
   BudgetCategoryDto,
 } from '@dolfin-finance/api-types';
 import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
-import { CategoryGroupSection } from '../molecules/budgetCard/CategoryGroupSection';
+import { CategoryGroupSection } from '../molecules/budgetPage/CategoryGroupSection';
 import { useMonthlyBudget } from '../../hooks/queries/useMonthlyBudget';
 
 export function BudgetCard({ month, year }: { month: number; year: number }) {
   const { isPending: categoriesAreLoading, data: budgetCategories } =
     useBudgetCategories();
 
-  const { isPending: budgetIsPendng, data: monthlyBudget } = useMonthlyBudget(
+  const { data: monthlyBudget, isPending: budgetIsPending } = useMonthlyBudget(
     month,
     year
   );
 
-  if (
-    categoriesAreLoading ||
-    !budgetCategories ||
-    budgetIsPendng ||
-    !monthlyBudget
-  )
-    return;
+  if (categoriesAreLoading || !budgetCategories) return null;
 
   const categoriesByGroup = budgetCategories.reduce((acc, category) => {
     acc[category.group.id] ??= [];
@@ -31,11 +25,12 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
     return acc;
   }, {} as { [key: number]: BudgetCategoryDto[] });
 
-  const allocationsByCategory: { [key: number]: MonthlyBudgetAllocationState } =
-    monthlyBudget.allocations.reduce(
-      (acc, allocation) => ({ ...acc, [allocation.categoryId]: allocation }),
-      {}
-    );
+  const allocationsByCategory:
+    | { [key: number]: MonthlyBudgetAllocationState }
+    | undefined = monthlyBudget?.allocations.reduce(
+    (acc, allocation) => ({ ...acc, [allocation.categoryId]: allocation }),
+    {}
+  );
 
   return (
     <Card radius="lg" withBorder px={0} py={0}>
@@ -52,6 +47,7 @@ export function BudgetCard({ month, year }: { month: number; year: number }) {
           <Table.Tbody>
             {Object.values(categoriesByGroup).map((categories) => (
               <CategoryGroupSection
+                isPending={budgetIsPending}
                 categories={categories}
                 allocations={allocationsByCategory}
                 key={categories[0].group.id}

@@ -2,7 +2,14 @@ import {
   MonthlyBudgetAllocationState,
   BudgetCategoryDto,
 } from '@dolfin-finance/api-types';
-import { ActionIcon, Group, Table, TextInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Group,
+  rem,
+  Skeleton,
+  Table,
+  TextInput,
+} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDeleteBudgetCategory } from '../../../hooks/mutations/useDeleteBudgetCategory';
@@ -14,15 +21,18 @@ export function CategoryRow({
   category,
   year,
   month,
+  isPending,
 }: {
   allocation?: MonthlyBudgetAllocationState;
   category: BudgetCategoryDto;
   year: number;
   month: number;
+  isPending: boolean;
 }) {
   const [isRowHovered, setIsRowHovered] = useState(false);
   const deleteBudgetCategory = useDeleteBudgetCategory();
   const updateBudgetAllocation = useUpdateBudgetAllocation();
+  const skeleton = <Skeleton height="1.2rem" width="3.5rem" />;
 
   return (
     <Table.Tr
@@ -45,31 +55,40 @@ export function CategoryRow({
           )}
         </Group>
       </Table.Td>
-      <Table.Td>
-        <TextInput
-          size="xs"
-          w={80}
-          defaultValue={(allocation?.amountCents || 0) / 100}
-          leftSection="€"
-          onKeyDown={(e) => {
-            if (e.code === 'Enter') {
-              e.currentTarget.blur();
-            }
-          }}
-          onBlur={(e) => {
-            updateBudgetAllocation.mutate({
-              year,
-              month,
-              categoryId: category.id,
-              amount: Number.parseFloat(e.target.value),
-            });
-          }}
-        />
+      <Table.Td width="20%">
+        {isPending ? (
+          <Skeleton width="5rem" height={rem(30)} />
+        ) : (
+          <TextInput
+            size="xs"
+            w={80}
+            defaultValue={(allocation?.amountCents || 0) / 100}
+            leftSection="€"
+            onKeyDown={(e) => {
+              if (e.code === 'Enter') {
+                e.currentTarget.blur();
+              }
+            }}
+            onBlur={(e) => {
+              updateBudgetAllocation.mutate({
+                year,
+                month,
+                categoryId: category.id,
+                amount: Number.parseFloat(e.target.value),
+              });
+            }}
+          />
+        )}
       </Table.Td>
-      <Table.Td>
-        <MoneyAmount amount={allocation?.spentCents || 0} />
+      <Table.Td width="20%">
+        {isPending ? (
+          skeleton
+        ) : (
+          <MoneyAmount amount={allocation?.spentCents || 0} />
+        )}
       </Table.Td>
       <Table.Td
+        width="20%"
         fw={600}
         c={
           (allocation?.remainingCents || 0) > 0
@@ -79,7 +98,11 @@ export function CategoryRow({
             : 'red'
         }
       >
-        <MoneyAmount amount={allocation?.remainingCents || 0} />
+        {isPending ? (
+          skeleton
+        ) : (
+          <MoneyAmount amount={allocation?.remainingCents || 0} />
+        )}
       </Table.Td>
     </Table.Tr>
   );
