@@ -115,7 +115,9 @@ export class TransactionController {
   }
   @Post('upload')
   @UseInterceptors(FileInterceptor('transactions'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<boolean> {
     const fileDatas = await this.statementFileUploadParserService.handleFile(
       file
     );
@@ -127,6 +129,8 @@ export class TransactionController {
       );
     }
 
-    this.transactionService.saveBulkTransactions(transactions);
+    await this.transactionService.saveBulkTransactions(transactions);
+
+    return true;
   }
 }

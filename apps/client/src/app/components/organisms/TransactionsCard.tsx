@@ -1,28 +1,24 @@
-import { DataTable } from 'mantine-datatable';
-import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
-import { useTransactions } from '../../hooks/queries/useTransactions';
+import { TransactionDto } from '@dolfin-finance/api-types';
 import { rem, Select, Text } from '@mantine/core';
-import { Dayjs } from 'dayjs';
-import currency from 'currency.js';
+import { DataTable } from 'mantine-datatable';
 import { usePatchTransaction } from '../../hooks/mutations/usePatchTransaction';
+import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
 import { MoneyAmount } from '../atoms/MoneyAmount';
 
 export function TransactionsCard({
-  startDate,
-  endDate,
+  isLoading,
+  transactions,
 }: {
-  startDate: Dayjs;
-  endDate: Dayjs;
+  transactions?: TransactionDto[];
+  isLoading: boolean;
 }) {
   const { isPending: budgetCategoriesLoading, data: budgetCategories } =
     useBudgetCategories();
-  const { isPending: transactionsLoading, data: transactions } =
-    useTransactions(startDate, endDate);
 
   const patchTransaction = usePatchTransaction();
 
-  if (budgetCategoriesLoading || transactionsLoading || !budgetCategories)
-    return <>LOADING</>;
+  if (!budgetCategoriesLoading && !budgetCategories)
+    throw Error('Could not find budget categories');
 
   return (
     <DataTable
@@ -31,7 +27,7 @@ export function TransactionsCard({
       withColumnBorders
       styles={{ table: { tableLayout: 'fixed' } }}
       striped
-      fetching={transactionsLoading}
+      fetching={isLoading || budgetCategoriesLoading}
       highlightOnHover
       records={transactions}
       columns={[
@@ -69,7 +65,7 @@ export function TransactionsCard({
             <Select
               size="sm"
               placeholder="Pick value"
-              data={budgetCategories.map((category) => ({
+              data={(budgetCategories || []).map((category) => ({
                 value: `${category.id}`,
                 label: category.name,
               }))}
