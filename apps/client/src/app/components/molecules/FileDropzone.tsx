@@ -2,7 +2,9 @@ import { Box, Group, LoadingOverlay, rem, Text } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import {
   Icon,
+  IconBomb,
   IconCheck,
+  IconExclamationMark,
   IconFile,
   IconUpload,
   IconX,
@@ -103,7 +105,7 @@ export function FileDropzone({
           )}
           {zoneState === 'error' && (
             <MessageGroup
-              Icon={IconFile}
+              Icon={IconBomb}
               iconColor="var(--mantine-color-red-4)"
               text="Something bad happened, please try again."
             />

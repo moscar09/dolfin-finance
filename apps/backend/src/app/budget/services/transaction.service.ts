@@ -118,6 +118,9 @@ export class TransactionService {
       );
     }
 
-    await this.transactionRepository.save(transactions);
+    await this.transactionRepository.upsert(transactions, {
+      upsertType: 'on-duplicate-key-update',
+      conflictPaths: {},
+    });
   }
 }

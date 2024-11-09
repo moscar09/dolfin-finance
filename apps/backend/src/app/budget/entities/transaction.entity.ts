@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BankAccount } from './bankAccount.entity';
 import { BudgetAllocation } from './budgetAllocation.entity';
 
@@ -7,6 +13,7 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index({ unique: true })
   @Column()
   referenceId: string;
 

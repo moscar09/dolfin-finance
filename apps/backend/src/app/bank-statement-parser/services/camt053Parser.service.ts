@@ -1,5 +1,5 @@
 import { CashManagementEndOfDayReport, Entry } from 'iso20022.js';
-
+import crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { TransactionPartyDto } from '../dto/transactionParty.dto';
 import { ParsedTransactionDto } from '../dto/parsedTransaction.dto';
@@ -24,9 +24,22 @@ export class Camt053ParserService {
     }
   }
 
+  private computeReferenceId(entry: Entry, dayIndex: number) {
+    const key = [
+      entry.bookingDate,
+      entry.additionalInformation,
+      entry.amount,
+      entry.creditDebitIndicator,
+      dayIndex,
+    ].join('|');
+
+    return crypto.createHash('md5').update(key).digest('hex');
+  }
+
   private getTransactionData(
     entry: Entry,
-    accountOwner: TransactionPartyDto
+    accountOwner: TransactionPartyDto,
+    dayIndex: number
   ): ParsedTransactionDto {
     const transactionData = new ParsedTransactionDto();
     transactionData.accountOwner = accountOwner;
@@ -44,7 +57,9 @@ export class Camt053ParserService {
         entry.additionalInformation,
         false
       );
-      transactionData.referenceId = entry.accountServicerReferenceId;
+      transactionData.referenceId =
+        entry.accountServicerReferenceId ||
+        this.computeReferenceId(entry, dayIndex);
       return transactionData;
     }
 
@@ -81,8 +96,8 @@ export class Camt053ParserService {
       const accountOwner = new TransactionPartyDto(iban, iban, true);
 
       parsedTransactions = parsedTransactions.concat(
-        statement.entries.map((entry) =>
-          this.getTransactionData(entry, accountOwner)
+        statement.entries.map((entry, idx) =>
+          this.getTransactionData(entry, accountOwner, idx)
         )
       );
     }
