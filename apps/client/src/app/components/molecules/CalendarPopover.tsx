@@ -1,4 +1,4 @@
-import { Button, Popover, Stack } from '@mantine/core';
+import { Button, Group, Popover, Stack } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 
 import { IconCalendarFilled } from '@tabler/icons-react';
@@ -35,6 +35,34 @@ export function CalendarPopover({
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
+          <Group grow>
+            <Button
+              variant="light"
+              size="compact-sm"
+              onClick={() => {
+                setDateRange(
+                  dayjs(new Date()).startOf('month'),
+                  dayjs(new Date()).endOf('month')
+                );
+                setOpened(false);
+              }}
+            >
+              This Month
+            </Button>
+            <Button
+              variant="light"
+              size="compact-sm"
+              onClick={() => {
+                setDateRange(
+                  dayjs(new Date()).subtract(1, 'month').startOf('month'),
+                  dayjs(new Date()).subtract(1, 'month').endOf('month')
+                );
+                setOpened(false);
+              }}
+            >
+              Previous Month
+            </Button>
+          </Group>
           <DatePicker
             type="range"
             allowSingleDateInRange

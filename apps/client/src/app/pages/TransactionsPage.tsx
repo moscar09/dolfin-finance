@@ -12,8 +12,8 @@ import {
 import { CalendarPopover } from '../components/molecules/CalendarPopover';
 import { PageTitle } from '../components/molecules/PageTitle';
 import { TransactionsCard } from '../components/organisms/TransactionsCard';
-import { LayoutShell } from './layout';
 import { axiosClient } from '../utils/axiosClient';
+import { LayoutShell } from './layout';
 
 export function TransactionsPage() {
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([
@@ -44,7 +44,7 @@ export function TransactionsPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setDropzoneExpanded(!dropzoneExpanded)}
+            onMouseDown={() => setDropzoneExpanded(!dropzoneExpanded)}
             rightSection={
               <IconCaretDownFilled
                 style={{
@@ -118,6 +118,7 @@ export function TransactionsPage() {
               </Group>
             </Dropzone>
           </Collapse>
+
           <TransactionsCard startDate={startDate} endDate={endDate} />
         </Box>
       </Stack>

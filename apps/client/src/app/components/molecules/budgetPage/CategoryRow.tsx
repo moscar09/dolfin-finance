@@ -1,10 +1,9 @@
 import {
-  MonthlyBudgetAllocationState,
   BudgetCategoryDto,
+  MonthlyBudgetAllocationState,
 } from '@dolfin-finance/api-types';
 import {
   ActionIcon,
-  Checkbox,
   Group,
   rem,
   Skeleton,
@@ -14,8 +13,8 @@ import {
 import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDeleteBudgetCategory } from '../../../hooks/mutations/useDeleteBudgetCategory';
-import { MoneyAmount } from '../../atoms/MoneyAmount';
 import { useUpdateBudgetAllocation } from '../../../hooks/mutations/useUpdateBudgetAllocation';
+import { MoneyAmount } from '../../atoms/MoneyAmount';
 
 export function CategoryRow({
   allocation,

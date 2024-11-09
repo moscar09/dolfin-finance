@@ -1,9 +1,8 @@
 import {
-  MonthlyBudgetAllocationState,
   BudgetCategoryDto,
+  MonthlyBudgetAllocationState,
 } from '@dolfin-finance/api-types';
 import {
-  ActionIcon,
   Button,
   Group,
   Popover,
@@ -12,11 +11,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import {
-  IconCaretDown,
-  IconCaretDownFilled,
-  IconCirclePlus,
-} from '@tabler/icons-react';
+import { IconCirclePlus } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useCreateBudgetCategory } from '../../../hooks/mutations/useCreateBudgetCategory';

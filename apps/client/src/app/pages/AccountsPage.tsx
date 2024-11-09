@@ -1,19 +1,20 @@
 // import useSWR from 'swr';
-import { Card, Title } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
-import { LayoutShell } from './layout';
+import { PageTitle } from '../components/molecules/PageTitle';
 import { useAccounts } from '../hooks/queries/useAccounts';
+import { LayoutShell } from './layout';
 
 export function AccountsPage() {
   const { isPending, data } = useAccounts();
 
   return (
     <LayoutShell>
-      <Card radius="lg">
-        <Title order={2}>Your accounts</Title>
+      <Stack gap="md">
+        <PageTitle title="Your accounts" />
         <DataTable
           withTableBorder
-          borderRadius="sm"
+          borderRadius="lg"
           withColumnBorders
           striped
           fetching={isPending}
@@ -36,7 +37,7 @@ export function AccountsPage() {
             },
           ]}
         />
-      </Card>
+      </Stack>
     </LayoutShell>
   );
 }

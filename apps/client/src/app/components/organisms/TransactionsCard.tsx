@@ -1,10 +1,11 @@
 import { DataTable } from 'mantine-datatable';
 import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
 import { useTransactions } from '../../hooks/queries/useTransactions';
-import { Select, Text } from '@mantine/core';
+import { rem, Select, Text } from '@mantine/core';
 import { Dayjs } from 'dayjs';
 import currency from 'currency.js';
 import { usePatchTransaction } from '../../hooks/mutations/usePatchTransaction';
+import { MoneyAmount } from '../atoms/MoneyAmount';
 
 export function TransactionsCard({
   startDate,
@@ -21,13 +22,14 @@ export function TransactionsCard({
   const patchTransaction = usePatchTransaction();
 
   if (budgetCategoriesLoading || transactionsLoading || !budgetCategories)
-    return;
+    return <>LOADING</>;
 
   return (
     <DataTable
       withTableBorder
       borderRadius="lg"
       withColumnBorders
+      styles={{ table: { tableLayout: 'fixed' } }}
       striped
       fetching={transactionsLoading}
       highlightOnHover
@@ -42,6 +44,7 @@ export function TransactionsCard({
           accessor: 'humanDescription',
           title: 'Description',
 
+          width: '30%',
           render: ({ description, humanDescription }) => (
             <Text size="sm" style={{ wordWrap: 'break-word' }}>
               {humanDescription || description}
@@ -51,17 +54,17 @@ export function TransactionsCard({
         {
           accessor: 'amount',
           title: 'Amount',
+          textAlign: 'right',
           render: ({ amountCents, isDebit }) => (
             <Text size="sm" c={isDebit ? 'red' : 'green'}>
-              {currency(isDebit ? 0 - amountCents : amountCents, {
-                fromCents: true,
-              }).toString()}
+              <MoneyAmount amount={isDebit ? 0 - amountCents : amountCents} />
             </Text>
           ),
         },
         {
           accessor: 'budgetSubcategoryId',
           title: 'Category',
+          width: rem(200),
           render: ({ id, budgetCategoryId }) => (
             <Select
               size="sm"
@@ -85,21 +88,15 @@ export function TransactionsCard({
         },
         {
           accessor: 'sourceAccount',
-          title: 'From',
-          render: ({ sourceAccount }) => (
-            <Text size="xs">
-              {sourceAccount?.prettyName || sourceAccount?.name || '-'}
-            </Text>
-          ),
-        },
-        {
-          accessor: 'destAccount',
-          title: 'To',
-          render: ({ destAccount }) => (
-            <Text size="xs">
-              {destAccount?.prettyName || destAccount?.name || '-'}
-            </Text>
-          ),
+          title: 'Payee',
+          render: ({ sourceAccount, destAccount, isDebit }) => {
+            const account = isDebit ? destAccount : sourceAccount;
+            return (
+              <Text size="xs">
+                {account?.prettyName || account?.name || '-'}
+              </Text>
+            );
+          },
         },
       ]}
     />

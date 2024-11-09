@@ -1,12 +1,8 @@
+import { PatchTransactionDto, TransactionDto } from '@dolfin-finance/api-types';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 import { axiosClient } from '../../utils/axiosClient';
 import { queryClient } from '../../utils/queryClient';
-import {
-  BudgetCategoryDto,
-  PatchTransactionDto,
-  TransactionDto,
-} from '@dolfin-finance/api-types';
-import { AxiosResponse } from 'axios';
 
 export function usePatchTransaction() {
   return useMutation({

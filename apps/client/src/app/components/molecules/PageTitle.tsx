@@ -21,7 +21,7 @@ export function PageTitle({
   endButton: EndButton,
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   startButton?: ReactNode;
   endButton?: ReactNode;
 }) {
@@ -32,9 +32,11 @@ export function PageTitle({
       </Title>
       <Group gap={0}>
         {StartButton}
-        <Title order={2} c="green.7">
-          {subtitle}
-        </Title>
+        {subtitle && (
+          <Title order={2} c="green.7">
+            {subtitle}
+          </Title>
+        )}
         {EndButton}
       </Group>
     </Stack>
