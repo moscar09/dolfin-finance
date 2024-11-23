@@ -7,14 +7,13 @@ import 'mantine-datatable/styles.layer.css';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AccountsPage, BudgetPage, TransactionsPage } from './pages';
+import { BudgetPage, TransactionsPage } from './pages';
 import { queryClient } from './utils/queryClient';
 import { theme } from './utils/theme';
 
 const router = createBrowserRouter([
-  { path: '/accounts', element: <AccountsPage /> },
   { path: '/budget', element: <BudgetPage /> },
-  { path: '/transactions', element: <TransactionsPage /> },
+  { path: '/accounts/:accountId', element: <TransactionsPage /> },
 ]);
 
 export function App() {

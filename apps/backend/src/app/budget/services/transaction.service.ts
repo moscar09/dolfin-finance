@@ -69,10 +69,15 @@ export class TransactionService {
         contraParty,
       ].entries()) {
         if (isRealAccount && !bankAccountByIBAN[accountNumber]) {
+          if (idx === 0)
+            throw new Error(
+              "You cannot add a bank account which doesn't exist"
+            );
+
           const newAccount = new BankAccount(
             name,
             accountNumber,
-            idx === 0 ? BankAccountType.ASSET : BankAccountType.EXTERNAL
+            BankAccountType.EXTERNAL
           );
           bankAccountByIBAN[accountNumber] = newAccount;
           accountsToAdd.push(newAccount);
@@ -104,6 +109,19 @@ export class TransactionService {
         sourceAccount = bankAccountByIBAN[contraParty.accountNumber];
       }
 
+      const typesWeCalculate = [
+        BankAccountType.CURRENT,
+        BankAccountType.SAVINGS,
+      ];
+      if (sourceAccount && typesWeCalculate.includes(sourceAccount.type)) {
+        sourceAccount.balance = sourceAccount.balance - amount.intValue;
+        if (sourceAccount.balanceDate < date) sourceAccount.balanceDate = date;
+      }
+      if (destAccount && typesWeCalculate.includes(destAccount.type)) {
+        destAccount.balance = destAccount.balance + amount.intValue;
+        if (destAccount.balanceDate < date) destAccount.balanceDate = date;
+      }
+
       transactions.push(
         new Transaction(
           referenceId || '',
@@ -122,5 +140,7 @@ export class TransactionService {
       upsertType: 'on-duplicate-key-update',
       conflictPaths: {},
     });
+
+    await this.bankAccountRepository.save(Object.values(bankAccountByIBAN));
   }
 }

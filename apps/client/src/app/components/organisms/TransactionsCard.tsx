@@ -1,5 +1,11 @@
 import { TransactionDto } from '@dolfin-finance/api-types';
-import { rem, Select, Text } from '@mantine/core';
+import {
+  ComboboxItem,
+  ComboboxItemGroup,
+  rem,
+  Select,
+  Text,
+} from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 import { usePatchTransaction } from '../../hooks/mutations/usePatchTransaction';
 import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
@@ -37,10 +43,21 @@ export function TransactionsCard({
   if (!budgetCategoriesLoading && !budgetCategories)
     throw Error('Could not find budget categories');
 
-  const budgetSelectorData = (budgetCategories || []).map((category) => ({
-    value: `${category.id}`,
-    label: category.name,
-  }));
+  const budgetSelectorData: {
+    [key: number]: ComboboxItemGroup<ComboboxItem>;
+  } = {};
+
+  for (const { group, name, id } of (budgetCategories || []).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )) {
+    budgetSelectorData[group.id] ??= { group: group.name, items: [] };
+    budgetSelectorData[group.id].items.push({ label: name, value: `${id}` });
+  }
+
+  // const budgetSelectorData = (budgetCategories || []).map((category) => ({
+  //   value: `${category.id}`,
+  //   label: category.name,
+  // }));
 
   return (
     <DataTable
@@ -63,10 +80,22 @@ export function TransactionsCard({
           width: '7rem',
         },
         {
+          accessor: 'sourceAccount',
+          title: 'Payee',
+          render: ({ sourceAccount, destAccount, isDebit }) => {
+            const account = isDebit ? destAccount : sourceAccount;
+            return (
+              <Text size="sm">
+                {account?.prettyName || account?.name || '-'}
+              </Text>
+            );
+          },
+        },
+        {
           accessor: 'humanDescription',
           title: 'Description',
 
-          width: '30%',
+          width: '40%',
           render: ({ description, humanDescription }) => (
             <Text size="sm" style={{ wordWrap: 'break-word' }}>
               {humanDescription || description}
@@ -77,6 +106,7 @@ export function TransactionsCard({
           accessor: 'amount',
           title: 'Amount',
           textAlign: 'right',
+          width: rem(100),
           render: ({ amountCents, isDebit }) => (
             <Text size="sm" c={isDebit ? 'red' : 'green'}>
               <MoneyAmount amount={isDebit ? 0 - amountCents : amountCents} />
@@ -86,14 +116,15 @@ export function TransactionsCard({
         {
           accessor: 'budgetSubcategoryId',
           title: 'Category',
-          width: rem(200),
           render: ({ id, budgetCategoryId }) => (
             <Select
               size="sm"
               placeholder="Pick value"
-              data={budgetSelectorData}
+              data={Object.values(budgetSelectorData)}
               defaultValue={`${budgetCategoryId}`}
-              comboboxProps={{ width: 180, position: 'bottom-end' }}
+              clearable
+              allowDeselect
+              comboboxProps={{ position: 'bottom-end' }}
               onChange={(v) =>
                 v
                   ? patchTransaction.mutate({
@@ -104,18 +135,6 @@ export function TransactionsCard({
               }
             />
           ),
-        },
-        {
-          accessor: 'sourceAccount',
-          title: 'Payee',
-          render: ({ sourceAccount, destAccount, isDebit }) => {
-            const account = isDebit ? destAccount : sourceAccount;
-            return (
-              <Text size="xs">
-                {account?.prettyName || account?.name || '-'}
-              </Text>
-            );
-          },
         },
       ]}
     />

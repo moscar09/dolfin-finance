@@ -1,17 +1,31 @@
-import { Box, Button, Collapse, Group, Stack } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Collapse,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+} from '@mantine/core';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
 import { IconCaretDownFilled } from '@tabler/icons-react';
-import { CalendarPopover } from '../components/molecules/CalendarPopover';
+import currency from 'currency.js';
+import { useParams } from 'react-router-dom';
 import { FileDropzone } from '../components/molecules/FileDropzone';
 import { PageTitle } from '../components/molecules/PageTitle';
 import { TransactionsCard } from '../components/organisms/TransactionsCard';
+import { useAccount } from '../hooks/queries/useAccount';
+import { useTransactions } from '../hooks/queries/useTransactions';
 import { axiosClient } from '../utils/axiosClient';
 import { LayoutShell } from './layout';
-import { useTransactions } from '../hooks/queries/useTransactions';
 
 export function TransactionsPage() {
+  const { accountId } = useParams();
+  const { data: account, isPending: accountLoading } = useAccount(
+    accountId ? Number.parseInt(accountId) : undefined
+  );
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([
     dayjs().startOf('d').subtract(3, 'month'),
     dayjs().endOf('d'),
@@ -26,22 +40,39 @@ export function TransactionsPage() {
     refetch: refetchTransactions,
   } = useTransactions(startDate, endDate);
 
+  const subtitle = account?.balance && account?.balanceDate && (
+    <>
+      {currency(account?.balance || 0, { fromCents: true }).format({
+        symbol: '€',
+      })}
+      {', as of '}
+      {dayjs(account?.balanceDate).format('MMMM DD')}
+    </>
+  );
+
   return (
     <LayoutShell>
       <Stack gap="md">
         <Group justify="space-between" align="end">
           <PageTitle
-            title="Your transactions between"
-            subtitle={`${startDate.format('MMMM D')} - ${endDate.format(
-              'MMMM D'
-            )}`}
-            endButton={
-              <CalendarPopover
-                startDate={startDate}
-                endDate={endDate}
-                setDateRange={(start, end) => setDateRange([start, end])}
-              />
+            title={
+              accountLoading ? (
+                <Skeleton w="100%" h="44px" />
+              ) : (
+                `Account overview: ${account?.name}`
+              )
             }
+            subtitle={subtitle}
+            // subtitle={`${startDate.format('MMMM D')} - ${endDate.format(
+            //   'MMMM D'
+            // )}`}
+            // endButton={
+            //   <CalendarPopover
+            //     startDate={startDate}
+            //     endDate={endDate}
+            //     setDateRange={(start, end) => setDateRange([start, end])}
+            //   />
+            // }
           />
           <Button
             size="sm"
@@ -78,7 +109,6 @@ export function TransactionsPage() {
                 );
 
                 if (success) await refetchTransactions();
-
                 return success;
               }}
             />

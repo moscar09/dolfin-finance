@@ -20,8 +20,8 @@ export function PageTitle({
   startButton: StartButton,
   endButton: EndButton,
 }: {
-  title: string;
-  subtitle?: string;
+  title: string | ReactNode;
+  subtitle?: string | ReactNode;
   startButton?: ReactNode;
   endButton?: ReactNode;
 }) {

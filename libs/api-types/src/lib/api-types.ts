@@ -1,5 +1,6 @@
 export enum BankAccountType {
-  ASSET = 'asset',
+  CURRENT = 'current',
+  SAVINGS = 'savings',
   EXTERNAL = 'external',
 }
 
@@ -9,7 +10,9 @@ export class BankAccountDto {
     public name: string,
     public prettyName: string,
     public identifier: string,
-    public type: BankAccountType
+    public type: BankAccountType,
+    public balance?: number,
+    public balanceDate?: Date
   ) {}
 }
 

@@ -1,10 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { axiosClient } from '../../utils/axiosClient';
-import { BankAccountDto } from '@dolfin-finance/api-types';
+import { BankAccountDto, BankAccountType } from '@dolfin-finance/api-types';
 
-export function useAccounts() {
+export function useAccounts(type: BankAccountType[] = []) {
   return useQuery<BankAccountDto[]>({
-    queryKey: ['accounts'],
-    queryFn: async () => (await axiosClient.get('/bank-account')).data,
+    queryKey: ['accounts', ...type.sort()],
+    queryFn: async () =>
+      (
+        await axiosClient.get('/bank-account', {
+          params: {
+            type: type,
+          },
+        })
+      ).data,
   });
 }
