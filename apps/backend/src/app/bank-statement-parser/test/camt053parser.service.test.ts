@@ -13,11 +13,20 @@ describe('Camt053ParserService', () => {
     );
     let data: string;
     let transactions: ParsedTransactionDto[];
+    let startingBalance: currency;
+    let startingBalanceDate: Date;
+    let recipientIban: string;
     beforeAll(() => {
+      const parserService = new Camt053ParserService();
+
       data = fs
         .readFileSync(__dirname + '/assets/abn_amro.camt053.xml')
         .toString('utf8');
-      transactions = Camt053ParserService.parse(data);
+      const parsedData = parserService.parse(data);
+      transactions = parsedData.transactions;
+      startingBalance = parsedData.startingBalance;
+      startingBalanceDate = parsedData.startingBalanceDate;
+      recipientIban = parsedData.recipientIban;
     });
 
     it('gets the correct number of transactions', () => {
@@ -36,7 +45,7 @@ describe('Camt053ParserService', () => {
           '11.11.111.111 Naam Adres 7 2960 Dorp',
           false
         ),
-        amount: currency(100),
+        amount: currency(100, { fromCents: true }),
       });
     });
 
@@ -54,7 +63,7 @@ describe('Camt053ParserService', () => {
           'NL46ABNA0499998748',
           true
         ),
-        amount: currency(100),
+        amount: currency(100, { fromCents: true }),
       });
     });
 
@@ -72,8 +81,22 @@ describe('Camt053ParserService', () => {
           'NL87SNSB0941352955',
           true
         ),
-        amount: currency(100),
+        amount: currency(100, { fromCents: true }),
       });
+    });
+
+    it('gets the correct startingBalanceDate from the report', () => {
+      expect(startingBalanceDate.toISOString().split('T').shift()).toBe(
+        '2013-03-28'
+      );
+    });
+
+    it('gets the correct startingBalance from the report', () => {
+      expect(startingBalance.intValue).toBe(100001);
+    });
+
+    it('get the correct recipient IBAN', () => {
+      expect(recipientIban).toBe('NL77ABNA0574908765');
     });
   });
 });

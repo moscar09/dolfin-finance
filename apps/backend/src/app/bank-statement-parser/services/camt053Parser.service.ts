@@ -1,4 +1,9 @@
-import { CashManagementEndOfDayReport, Entry } from 'iso20022.js';
+import {
+  Balance,
+  BalanceTypeCode,
+  CashManagementEndOfDayReport,
+  Entry,
+} from 'iso20022.js';
 import crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { TransactionPartyDto } from '../dto/transactionParty.dto';
@@ -86,21 +91,38 @@ export class Camt053ParserService {
     return transactionData;
   }
 
-  parse(input: string): ParsedTransactionDto[] {
+  public parse(input: string): {
+    startingBalance: currency;
+    startingBalanceDate: Date;
+    recipientIban: string;
+    transactions: ParsedTransactionDto[];
+  } {
     const data = CashManagementEndOfDayReport.fromXML(input);
+
+    const firstBalance = data.statements
+      .reduce((prev, stmt) => [...prev, ...stmt.balances], [] as Balance[])
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .filter(
+        (balance) => balance.type === BalanceTypeCode.PreviouslyClosedBooked
+      )
+      .pop();
 
     const { iban } = data.statements[0].account as { iban?: string };
 
     let parsedTransactions: ParsedTransactionDto[] = [];
     for (const statement of data.statements) {
       const accountOwner = new TransactionPartyDto(iban, iban, true);
-
       parsedTransactions = parsedTransactions.concat(
         statement.entries.map((entry, idx) =>
           this.getTransactionData(entry, accountOwner, idx)
         )
       );
     }
-    return parsedTransactions;
+    return {
+      recipientIban: iban,
+      startingBalanceDate: firstBalance?.date,
+      startingBalance: currency(firstBalance?.amount, { fromCents: true }),
+      transactions: parsedTransactions,
+    };
   }
 }

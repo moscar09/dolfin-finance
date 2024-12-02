@@ -14,7 +14,7 @@ export class Transaction {
   id: number;
 
   @Index({ unique: true })
-  @Column()
+  @Column({ nullable: true })
   referenceId: string;
 
   @Column()
@@ -42,7 +42,7 @@ export class Transaction {
   allocation?: BudgetAllocation;
 
   constructor(
-    referenceId: string,
+    referenceId: string | undefined,
     date: Date,
     description: string,
     humanDescription: string,

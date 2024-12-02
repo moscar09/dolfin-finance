@@ -1,8 +1,10 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
 import 'mantine-datatable/styles.layer.css';
+import 'reflect-metadata';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 
@@ -22,9 +24,11 @@ export function App() {
       <ColorSchemeScript defaultColorScheme="light" />
 
       <MantineProvider defaultColorScheme="light" theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+        <ModalsProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </ModalsProvider>
       </MantineProvider>
     </>
   );

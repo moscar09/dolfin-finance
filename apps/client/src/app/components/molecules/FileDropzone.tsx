@@ -4,7 +4,6 @@ import {
   Icon,
   IconBomb,
   IconCheck,
-  IconExclamationMark,
   IconFile,
   IconUpload,
   IconX,
@@ -44,7 +43,7 @@ export function FileDropzone({
 }: {
   label: string;
   formField: string;
-  queryFn: (formData: FormData) => Promise<boolean>;
+  queryFn: (formData: FormData) => Promise<unknown>;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [zoneState, setZoneState] = useState<'error' | 'success' | 'idle'>(

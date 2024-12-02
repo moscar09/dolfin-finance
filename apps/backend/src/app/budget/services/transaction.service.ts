@@ -1,7 +1,7 @@
-import { BankAccountType } from '@dolfin-finance/api-types';
+import { BankAccountType, PostTransactionDto } from '@dolfin-finance/api-types';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { ParsedTransactionDto } from '../../bank-statement-parser/dto/parsedTransaction.dto';
 import { BankAccount } from '../entities/bankAccount.entity';
 import { Transaction } from '../entities/transaction.entity';
@@ -47,6 +47,73 @@ export class TransactionService {
       (await this.monthlyBudgetService.addAllocation(budget, categoryId, 0));
 
     transaction.allocation = budgetAllocation;
+
+    return this.transactionRepository.save(transaction);
+  }
+
+  private updateAccountBalance(
+    date: Date,
+    amount: number,
+    sourceAccount?: BankAccount,
+    destAccount?: BankAccount
+  ) {
+    const typesWeCalculate = [BankAccountType.CURRENT, BankAccountType.SAVINGS];
+    if (sourceAccount && typesWeCalculate.includes(sourceAccount.type)) {
+      sourceAccount.balance = sourceAccount.balance - amount;
+      if (sourceAccount.balanceDate < date) sourceAccount.balanceDate = date;
+    }
+    if (destAccount && typesWeCalculate.includes(destAccount.type)) {
+      destAccount.balance = destAccount.balance + amount;
+      if (destAccount.balanceDate < date) destAccount.balanceDate = date;
+    }
+  }
+
+  async insertTransaction({
+    sourceAccountIBAN,
+    destAccountIBAN,
+    referenceId,
+    date,
+    description,
+    humanDescription,
+    isDebit,
+    amountCents,
+  }: PostTransactionDto) {
+    const identifierList = [sourceAccountIBAN, destAccountIBAN].filter(
+      (acct) => !!acct
+    );
+
+    let sourceAccount: BankAccount | undefined = undefined;
+    let destAccount: BankAccount | undefined = undefined;
+
+    if (identifierList.length) {
+      const accounts = await this.bankAccountRepository.findBy({
+        identifier: In(identifierList),
+      });
+
+      accounts.forEach((account) => {
+        if (account.identifier === sourceAccountIBAN) sourceAccount = account;
+        else destAccount = account;
+      });
+    }
+    const transaction = new Transaction(
+      referenceId,
+      date,
+      description,
+      humanDescription,
+      isDebit,
+      amountCents,
+      sourceAccount,
+      destAccount
+    );
+
+    this.updateAccountBalance(date, amountCents, sourceAccount, destAccount);
+    const accountsToUpdate = [];
+    if (sourceAccount) accountsToUpdate.push(sourceAccount);
+    if (destAccount) accountsToUpdate.push(destAccount);
+
+    if (accountsToUpdate.length) {
+      await this.bankAccountRepository.save(accountsToUpdate);
+    }
 
     return this.transactionRepository.save(transaction);
   }
@@ -109,18 +176,12 @@ export class TransactionService {
         sourceAccount = bankAccountByIBAN[contraParty.accountNumber];
       }
 
-      const typesWeCalculate = [
-        BankAccountType.CURRENT,
-        BankAccountType.SAVINGS,
-      ];
-      if (sourceAccount && typesWeCalculate.includes(sourceAccount.type)) {
-        sourceAccount.balance = sourceAccount.balance - amount.intValue;
-        if (sourceAccount.balanceDate < date) sourceAccount.balanceDate = date;
-      }
-      if (destAccount && typesWeCalculate.includes(destAccount.type)) {
-        destAccount.balance = destAccount.balance + amount.intValue;
-        if (destAccount.balanceDate < date) destAccount.balanceDate = date;
-      }
+      this.updateAccountBalance(
+        date,
+        amount.intValue,
+        sourceAccount,
+        destAccount
+      );
 
       transactions.push(
         new Transaction(

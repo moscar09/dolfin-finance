@@ -1,4 +1,4 @@
-import { TransactionDto } from '@dolfin-finance/api-types';
+import { TransactionResponseDto } from '@dolfin-finance/api-types';
 import {
   ComboboxItem,
   ComboboxItemGroup,
@@ -7,22 +7,23 @@ import {
   Text,
 } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
-import { usePatchTransaction } from '../../hooks/mutations/usePatchTransaction';
+import { useUpdateTransaction } from '../../hooks/mutations/useUpdateTransaction';
 import { useBudgetCategories } from '../../hooks/queries/useBudgetCategories';
 import { MoneyAmount } from '../atoms/MoneyAmount';
 import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 
 const PAGE_SIZE = 25;
 export function TransactionsCard({
   isLoading,
   transactions,
 }: {
-  transactions?: TransactionDto[];
+  transactions?: TransactionResponseDto[];
   isLoading: boolean;
 }) {
   const { isPending: budgetCategoriesLoading, data: budgetCategories } =
     useBudgetCategories();
-  const patchTransaction = usePatchTransaction();
+  const patchTransaction = useUpdateTransaction();
 
   const [page, setPage] = useState(1);
   const [records, setRecords] = useState(
@@ -78,6 +79,9 @@ export function TransactionsCard({
           accessor: 'date',
           title: 'Date',
           width: '7rem',
+          render: ({ date }) => (
+            <Text size="sm">{dayjs(date).format('DD.MM.YYYY')}</Text>
+          ),
         },
         {
           accessor: 'sourceAccount',

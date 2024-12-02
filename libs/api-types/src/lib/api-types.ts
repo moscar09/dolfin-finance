@@ -1,3 +1,5 @@
+import { Expose } from 'class-transformer';
+
 export enum BankAccountType {
   CURRENT = 'current',
   SAVINGS = 'savings',
@@ -5,15 +7,20 @@ export enum BankAccountType {
 }
 
 export class BankAccountDto {
-  constructor(
-    public id: number,
-    public name: string,
-    public prettyName: string,
-    public identifier: string,
-    public type: BankAccountType,
-    public balance?: number,
-    public balanceDate?: Date
-  ) {}
+  @Expose()
+  public id: number;
+  @Expose()
+  public name: string;
+  @Expose()
+  public prettyName: string;
+  @Expose()
+  public identifier: string;
+  @Expose()
+  public type: BankAccountType;
+  @Expose()
+  public balance?: number;
+  @Expose()
+  public balanceDate?: Date;
 }
 
 export class BudgetCategoryDto {
@@ -49,23 +56,4 @@ export class MonthlyBudgetAllocationState {
   ) {
     this.remainingCents = this.amountCents - this.spentCents;
   }
-}
-
-export class PatchTransactionDto {
-  constructor(public categoryId: number) {}
-}
-
-export class TransactionDto {
-  constructor(
-    public id: number,
-    public referenceId: string,
-    public date: string,
-    public description: string,
-    public humanDescription: string,
-    public isDebit: boolean,
-    public amountCents: number,
-    public budgetCategoryId?: number,
-    public sourceAccount?: BankAccountDto,
-    public destAccount?: BankAccountDto
-  ) {}
 }
